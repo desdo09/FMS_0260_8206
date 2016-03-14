@@ -11,6 +11,7 @@ Disk::Disk()
 
 Disk::Disk(string & fileName, string & Owner, diskCod cod)
 {
+	//cod
 	switch (cod)
 	{
 	case create:

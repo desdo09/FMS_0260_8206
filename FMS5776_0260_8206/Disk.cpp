@@ -8,7 +8,7 @@ Disk::Disk()
 
 
 }
-//ctor
+//Constructor
 Disk::Disk(string & fileName, string & Owner, diskCod cod)
 {
 	switch (cod)

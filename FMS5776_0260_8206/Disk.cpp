@@ -1,6 +1,5 @@
 #include "Disk.h"
 
-#pragma region constructor
 Disk::Disk()
 {
 	
@@ -33,19 +32,42 @@ Disk::~Disk()
 {
 	dskfl.close();
 }
-#pragma endregion
 
 
+
+/*************************************************
+* FUNCTION
+*    createdisk
+*
+* PARAMETERS
+*    diskName – The name of the disk that will be created
+*	 owner    - The disk owner name
+*
+* MEANING
+*     This functions will create a new Disk in a few steps:
+*			1. Create the file and insert all sectors
+*			2. Create the volume header and insert it
+*			3. Create the DAT and insert it
+*                 
+* SEE ALSO
+*	  mountdisk function 
+*
+**************************************************/
 
 void Disk::createdisk(string & diskName, string & owner) {
 
-	//Open a file
-	dskfl.open(diskName, ios::in | ios::out, ios::binary);
+	if (dskfl.is_open())
+		dskfl.close();
 
-	// in case that does open it, throw an exeption
+
+	diskName += ".bin";
+//	if(!ifstream(diskName))
+	//Open a file
+	dskfl.open(diskName.c_str(), ios::in | ios::out, ios::binary);
+	
+	// in case that doesn't open it, throw an exception
 	if (!dskfl.is_open()) {
 		throw new exception ("Error to open the file!");
-		return;
 	}
 	
 	for (int i = 0; i < 1600; i++)
@@ -90,34 +112,82 @@ void Disk::createdisk(string & diskName, string & owner) {
 
 void Disk::mountdisk(string & fileName)
 {
+	if (this->mounted)
+		throw new exception("There another disk mounted already");
+
 	if(dskfl.is_open())
 		dskfl.close();
 
 
-	dskfl.open(fileName, ios::in | ios::out, ios::binary);
+	this->dskfl.open(fileName, ios::in | ios::out, ios::binary);
 
-	dskfl.read(buffer, 1024);
-	currDiskSectorNr = sizeof(Sector);
+	this->dskfl.read(buffer, 1024);
+	this->currDiskSectorNr = 1;
 
 	importBufferToObject(&vhd, sizeof(VolumeHeader));
 
+	this->dskfl.read(buffer, 1024);
+	this->currDiskSectorNr = 2;
+
+	importBufferToObject(&dat, sizeof(DAT));
+
+	this->mounted = true;
 }
 
 void Disk::unmountdisk()
 {
+	if (!dskfl.is_open())
+		throw new exception("No disk mounted");
+
+	dskfl.seekp(ios::beg);
+
+	dskfl.write((char *)&vhd, sizeof(Sector));
+
+	dskfl.write((char *)&dat, sizeof(Sector));
+
+	this->currDiskSectorNr = 0;
+
+	this->mounted = false;
+
+	dskfl.close();
+
 }
 
 void Disk::recreatedisk(string &)
 {
+
 }
 
-fstream Disk::getdskfl()
+/*************************************************
+* FUNCTION
+*    getdskfl
+* PARAMETERS
+*   The function does not get a parameter
+* RETURN VALUE
+*	Returns the fstream object that opened the file    
+*
+* MEANING
+*     The function will verify if there a file opened
+*	  if yes the function return the fstream object
+*	  if not the function return a nullptr
+*
+***************************************************/
+fstream * Disk::getdskfl(void)
 {
-	return fstream();
+
+	if(this->dskfl.is_open())
+		return &dskfl ;
+
+	return nullptr;
 }
 
-void Disk::seekToSector(uint)
+void Disk::seekToSector(uint number)
 {
+	this->dskfl.seekg(ios::beg);
+	this->dskfl.seekg(ios::beg);
+
+	this->dskfl.seekg(number * sizeof(Sector));
+	this->dskfl.seekg(number * sizeof(Sector));
 }
 
 void Disk::writeSector(uint, Sector *)
@@ -132,7 +202,7 @@ void Disk::readSector(int, Sector *)
 {
 }
 
-void Disk::redSector(Sector *)
+void Disk::readSector(Sector *)
 {
 }
 

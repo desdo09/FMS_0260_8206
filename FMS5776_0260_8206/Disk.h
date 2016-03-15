@@ -36,7 +36,7 @@ public:
 	void unmountdisk();
 	void recreatedisk(string &);
 
-	fstream getdskfl();
+	fstream * getdskfl();
 
 	void seekToSector(uint);
 	
@@ -44,7 +44,7 @@ public:
 	void writeSector(Sector *);
 
 	void readSector(int, Sector*);
-	void redSector(Sector *);
+	void readSector(Sector *);
 
 	void importBufferToObject(void *, int size);
 

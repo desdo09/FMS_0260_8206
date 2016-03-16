@@ -123,7 +123,7 @@ void Disk::createdisk(string & diskName, string & owner) {
 
 	dskfl.write((char *)&dat, sizeof(Sector));									// Write the DAT into the disk
 
-	//File doesn't closed 
+	//File doesn't closed
 }
 
 /*************************************************

@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\Level_0">
       <UniqueIdentifier>{a2ba0160-536d-439e-8105-8688851eabb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Program Files">
+      <UniqueIdentifier>{496c514c-58d1-4515-a31b-5254ef29495d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.h">
@@ -42,8 +45,11 @@
     <ClInclude Include="VolumeHeader.h">
       <Filter>Header Files\Level_0</Filter>
     </ClInclude>
+    <ClInclude Include="ProgramExeption.h">
+      <Filter>Program Files</Filter>
+    </ClInclude>
     <ClInclude Include="Header.h">
-      <Filter>Header Files</Filter>
+      <Filter>Program Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

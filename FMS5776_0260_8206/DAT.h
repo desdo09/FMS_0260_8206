@@ -8,7 +8,7 @@ private:
 
 	uint    sectorNr;
 	DATtype dat;
-	char    emptyArea[816];
+	char    emptyArea[1024-8-sizeof(DATtype)];
 
 public:
 	DAT();
@@ -19,13 +19,6 @@ public:
 	//get
 	uint    GetsectorNr() { return sectorNr; }
 	DATtype Getdat() { return dat; }
-	char *  GetemptyArea(){ return emptyArea; }
-
-	//set
-	void    SetsectorNr(uint);
-	void    Setdat(DATtype);
-	void    SetemptyArea(char *);
-
 
 	friend class Disk;
 };

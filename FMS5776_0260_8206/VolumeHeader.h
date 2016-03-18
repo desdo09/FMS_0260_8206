@@ -45,14 +45,9 @@ public:
 	void SetdiskOwner(string);
 	void SetprodDate(string);
 	void SetformaDate(string);
-	void SetemptyArea(char *);
-	void SetsectorNr(uint);
-	void SetclusQty(uint);
-	void SetdataClusQty(uint);
-	void SetaddrDAT(uint);
-	void SetaddrRootDir(uint);
-	void SetaddrDataStart(uint);
-	void SetisFormated(uint);
+	void SetisFormated(bool);
+
+	void Start();
 
 #pragma endregion
 
@@ -64,7 +59,7 @@ public:
 	//friends
 	 
 	friend class TestLevel_0;
-	friend class Disk;
+	//friend class Disk;
 	
 
 };

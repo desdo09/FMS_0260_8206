@@ -2,13 +2,7 @@
 
 VolumeHeader::VolumeHeader()
 {
-	sectorNr = 0;
-	clusQty = 0;
-	dataClusQty =0;
-	addrDAT = 0;
-	addrRootDir = 0;
-	addrDataStart = 0;
-	isFormated = false;
+	
 	
 }
 
@@ -20,54 +14,48 @@ VolumeHeader::~VolumeHeader()
 
 #pragma region set
 
-void VolumeHeader::SetdiskName(string)
+void VolumeHeader::SetdiskName(string name)
 {
+	memcpy(diskName, name.c_str(),12);
 }
 
-void VolumeHeader::SetdiskOwner(string)
+void VolumeHeader::SetdiskOwner(string name)
 {
+	memcpy(diskOwner, name.c_str(), 12);
 }
 
-void VolumeHeader::SetprodDate(string)
+void VolumeHeader::SetprodDate(string date)
 {
+	memccpy(diskName, date.c_str(), 0, 12);
 }
 
-void VolumeHeader::SetformaDate(string)
+void VolumeHeader::SetformaDate(string date)
 {
+	memccpy(diskName, date.c_str(), 0, 12);
+}
+
+void VolumeHeader::SetisFormated(bool flag)
+{
+	this->isFormated = flag;
+}
+
+void VolumeHeader::Start()
+{
+	this->sectorNr = 0;														     	// Volume Header sector index 								
+	_strdate(this->prodDate);														// The current date
+	this->isFormated = false;														// set isFormanted object as false
+	strcpy(this->formatDate, " ");												    // set the formated date as empty
+	strcpy(this->emptyArea, " ");													// set the empty area empty
+	this->clusQty = amountOfSectors;												// Sector numbers existing
+	this->dataClusQty = amountOfSectors - 4;										// Sector numbers for data only
+	this->addrDAT = 1;															    // The sector index when is allocate the DAT
+	this->addrRootDir = 1;														    // The sector index when is allocate the root directory
+	this->addrRootDirCpy = 1000;													// The root directory address
+	this->addrDATcpy = 800;														    // The DAT address
+	this->addrDataStart = 2;														// The first sector for data
 }
 
 
-void VolumeHeader::SetemptyArea(char *)
-{
-}
-
-void VolumeHeader::SetsectorNr(uint)
-{
-}
-
-void VolumeHeader::SetclusQty(uint)
-{
-}
-
-void VolumeHeader::SetdataClusQty(uint)
-{
-}
-
-void VolumeHeader::SetaddrDAT(uint)
-{
-}
-
-void VolumeHeader::SetaddrRootDir(uint)
-{
-}
-
-void VolumeHeader::SetaddrDataStart(uint)
-{
-}
-
-void VolumeHeader::SetisFormated(uint)
-{
-}
 
 #pragma endregion
 

@@ -78,8 +78,8 @@ public:
 	static void test_0()
 	{
 
-		string diskName = "TheDisk.bin";
-		string ownerName = "David & Josseph";
+		string diskName = "TheDisk";
+		string ownerName = "Da&Jo";
 
 		printStructSize();
 		test_create(diskName, ownerName);
@@ -100,6 +100,11 @@ void main() {
 	catch (exception ex)
 	{
 		cout << ex.what() << endl;
+	}
+	catch (char * msg)
+	{
+		string err(msg);
+		cout << err << endl;
 	}
 	catch (...)
 	{

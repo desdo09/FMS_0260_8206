@@ -116,6 +116,7 @@
     <ClInclude Include="DirEntry.h" />
     <ClInclude Include="Disk.h" />
     <ClInclude Include="FileHeader.h" />
+    <ClInclude Include="ProgramExeption.h" />
     <ClInclude Include="Sector.h" />
     <ClInclude Include="VolumeHeader.h" />
   </ItemGroup>

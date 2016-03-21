@@ -9,7 +9,7 @@ class Disk
 {
 private:
 
-	VolumeHeader  vhd;
+	VolumeHeader  vhd;  
 	DAT           dat;
 	RootDir       rootdir;
 	bool          mounted;

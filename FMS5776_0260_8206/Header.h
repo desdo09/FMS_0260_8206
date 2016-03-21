@@ -17,3 +17,6 @@ using  uint = unsigned int;
 #define amountOfSectors 1600
 
 using  DATtype = bitset<amountOfSectors>;
+
+
+

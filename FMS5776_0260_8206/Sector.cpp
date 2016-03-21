@@ -14,4 +14,10 @@ Sector::Sector(uint index)
 
 Sector::~Sector()
 {
+	//delete[] rawData;
+}
+
+void Sector::setSectorNr(uint x)
+{
+	this->sectorNr = x;
 }

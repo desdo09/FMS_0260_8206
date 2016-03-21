@@ -5,6 +5,7 @@ class Sector
 
 public:
 	Sector();
+	Sector(uint);
 	~Sector();
 	friend class TestLevel_0;
 	friend class Disk;

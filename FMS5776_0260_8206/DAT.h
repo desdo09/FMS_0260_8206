@@ -1,3 +1,4 @@
+#pragma once
 #include "Header.h"
 
 
@@ -14,7 +15,7 @@ public:
 	DAT();
 	~DAT();
 
-
+	void resetDat();
 
 	//get
 	uint    GetsectorNr() { return sectorNr; }

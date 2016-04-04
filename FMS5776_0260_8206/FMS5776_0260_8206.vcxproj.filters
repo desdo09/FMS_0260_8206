@@ -13,37 +13,37 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Level_0">
-      <UniqueIdentifier>{77551a19-8678-44da-af60-67709a9338e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\Level_0">
-      <UniqueIdentifier>{a2ba0160-536d-439e-8105-8688851eabb2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Program Files">
       <UniqueIdentifier>{496c514c-58d1-4515-a31b-5254ef29495d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physical layer">
+      <UniqueIdentifier>{77551a19-8678-44da-af60-67709a9338e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Pphysical layer">
+      <UniqueIdentifier>{a2ba0160-536d-439e-8105-8688851eabb2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="DAT.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="Dir.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="DirEntry.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="FileHeader.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="Sector.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="VolumeHeader.h">
-      <Filter>Header Files\Level_0</Filter>
+      <Filter>Header Files\Physical layer</Filter>
     </ClInclude>
     <ClInclude Include="ProgramExeption.h">
       <Filter>Program Files</Filter>
@@ -54,25 +54,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VolumeHeader.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="DAT.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="Dir.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="DirEntry.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="Disk.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="FileHeader.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="Sector.cpp">
-      <Filter>Resource Files\Level_0</Filter>
+      <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>

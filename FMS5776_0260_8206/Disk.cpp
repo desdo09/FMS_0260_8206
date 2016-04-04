@@ -1,6 +1,9 @@
 #include "Disk.h"
 
 
+
+
+
 Disk::Disk()
 {
 	
@@ -34,9 +37,11 @@ Disk::~Disk()
 	
 }
 
-
-
-
+/*************************************************
+*
+*				  Level 0
+*
+**************************************************/
 
 void Disk::createdisk(string diskName, string owner) {
 
@@ -81,13 +86,11 @@ void Disk::createdisk(string diskName, string owner) {
 	dskfl.write((char *)&dat, sizeof(Sector));									// Write the DAT into the disk
 	
 	dskfl.close();
-	//dskfl.flush();
+
 
 	
 	//File doesn't closed
 }
-
-
 
 void Disk::mountdisk(string  fileName)
 {
@@ -115,7 +118,6 @@ void Disk::mountdisk(string  fileName)
 
 	this->mounted = true;														// The disk is mounted
 }
-
 
 void Disk::unmountdisk()
 {
@@ -162,7 +164,6 @@ void Disk::recreatedisk(string diskName)
 
 }
 
-
 fstream * Disk::getdskfl(void)
 {
 
@@ -191,6 +192,8 @@ void Disk::seekToSector(uint index)
 
 void Disk::writeSector(uint index, Sector * sec)
 {
+
+
 	seekToSector(index);
 
 	writeSector(sec);
@@ -199,6 +202,9 @@ void Disk::writeSector(uint index, Sector * sec)
 
 void Disk::writeSector(Sector * sec)
 {
+	if (!this->mounted)
+		throw ProgramExeption("There not mounted disk", "WriteSector");
+
 	dskfl.write((char *) &sec, sizeof(sec));
 
 	this->currDiskSectorNr++;													// Update Current Disk Sector Number
@@ -213,6 +219,9 @@ void Disk::readSector(uint index, Sector * sec)
 
 void Disk::readSector(Sector * sec)
 {
+	if (!this->mounted)
+		throw ProgramExeption("There not mounted disk", "WriteSector");
+
 	dskfl.read((char *)&sec, sizeof(sec));
 
 	this->currDiskSectorNr++;													// Update Current Disk Sector Number
@@ -228,4 +237,142 @@ void Disk::VerifyAndAddExt(string & file)
 		{
 			file += diskExtension;												// Add the extension of the file (disk)  
 		}
+}
+
+
+/*************************************************
+*
+*				  Level 1
+*
+**************************************************/
+
+/*Private functions*/
+uint Disk::firstFit(uint sectoresAmount)
+{
+	int index;
+	int temp = sectoresAmount;
+	for (int i = 4; i < amountOfSectors; i++)
+	{
+		if (dat.dat[i])
+			temp = sectoresAmount;
+		else
+			temp--;
+
+		if (!temp)
+		{
+			index = i - sectoresAmount;
+			break;
+		}
+	}
+	return index;
+}
+ 
+uint Disk::bestFit(uint sectoresAmount)
+{
+	int index =-1;
+	int temp = sectoresAmount;
+	int big;
+	for (int i = 4; i < amountOfSectors; i++)
+	{
+		if (dat.dat[i])
+		{
+			if (temp <= 0 && big<temp*(-1))
+			{
+				big = temp*(-1);
+				index = i - sectoresAmount + temp;
+			}
+			temp = sectoresAmount;
+			
+		}
+		else
+			temp--;
+	}
+	
+	return index;
+
+}
+
+uint Disk::worstFit(uint sectoresAmount)
+{
+	int index = -1;
+	int temp = sectoresAmount;
+	int small;
+	for (int i = 4; i < amountOfSectors; i++)
+	{
+		if (dat.dat[i])
+		{
+			if (temp <= 0 && small>temp*(-1))
+			{
+				small = temp*(-1);
+				index = i - sectoresAmount + temp;
+			}
+			temp = sectoresAmount;
+
+		}
+		else
+			temp--;
+	}
+
+	return index;
+}
+
+
+/*Public functions*/
+void Disk::format(string & owner)
+{
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "format");
+
+	if(this->vhd.GetdiskOwner() != owner)
+		throw ProgramExeption("This user cannot format this disk", "Format");
+
+	dat.resetDat();
+	writeSector(1,new Sector(&dat));
+
+}
+
+int Disk::howmuchempty()
+{
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "howmuchempty");
+	int count;
+	for (int i = 0; i < amountOfSectors; i*=2)
+	{
+		if (!dat.dat[i] & !dat.dat[i + 1])
+			count++;
+	}
+	return count;
+
+}
+
+void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
+{
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "howmuchempty");
+
+	if(howmuchempty()>sectoresAmount)
+		throw ProgramExeption("No space left", "howmuchempty");
+	int index;
+
+	switch (algo)
+	{
+	case Disk::first_Fit:
+		index = firstFit(sectoresAmount);
+		break;
+	case Disk::best_Fit:
+		index = bestFit(sectoresAmount);
+		break;
+	case Disk::worst_Fit:
+		index = worstFit(sectoresAmount);
+		break;
+	default:
+		break;
+	}
+
+	for (int i = 0; i < sectoresAmount; i++)
+	{
+		FAT.set(index + i, 0);
+		dat.dat.set(index + i, 1);
+	}
+
 }

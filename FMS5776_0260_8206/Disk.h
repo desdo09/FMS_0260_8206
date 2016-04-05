@@ -17,6 +17,10 @@ private:
 	uint          currDiskSectorNr;
 	char          buffer[sizeof(Sector)];
 	
+	uint firstFit(uint);
+	uint bestFit(uint);
+	uint worstFit(uint);
+
 public:
 	enum ConstructorCod
 	{
@@ -24,6 +28,7 @@ public:
 		Mount = 'm',
 		
 	};
+	enum AlgorithmType { first_Fit, best_Fit, worst_Fit};
 	/*************************************************
 	* CONSTRUCTOR
 	*    Default constructor
@@ -53,6 +58,11 @@ public:
 	**************************************************/
 	~Disk();
 
+	/*************************************************
+	* 
+	*				  Level 0
+	*
+	**************************************************/
 
 	/*************************************************
 	* FUNCTION
@@ -150,15 +160,96 @@ public:
 	void seekToSector(uint);
 	
 	void writeSector(uint, Sector*);
+
 	void writeSector(Sector *);
 
 	void readSector(uint, Sector*);
 
 	void readSector(Sector *);
 
+	void VerifyAndAddExt(string &);
+
+	/*************************************************
+	*
+	*				  Level 1
+	*
+	**************************************************/
+
+	/*************************************************
+	* FUNCTION
+	*   
+	* PARAMETERS
+	*  
+	* RETURN VALUE
+	*	
+	*
+	* MEANING
+	*    
+	*
+	***************************************************/
+	void format(string &);
+
+	/*************************************************
+	* FUNCTION
+	*
+	* PARAMETERS
+	*
+	* RETURN VALUE
+	*
+	*
+	* MEANING
+	*
+	*
+	***************************************************/
+	int howmuchempty();
+
+	/*************************************************
+	* FUNCTION
+	*
+	* PARAMETERS
+	*
+	* RETURN VALUE
+	*
+	*
+	* MEANING
+	*
+	*
+	***************************************************/
+	void alloc(DATtype &, uint, AlgorithmType);
+
+
+
+
+	/*************************************************
+	* FUNCTION
+	*
+	* PARAMETERS
+	*
+	* RETURN VALUE
+	*
+	*
+	* MEANING
+	*
+	*
+	***************************************************/
+	void allocextend(DATtype &, uint, AlgorithmType);
+
+	/*************************************************
+	* FUNCTION
+	*
+	* PARAMETERS
+	*
+	* RETURN VALUE
+	*
+	*
+	* MEANING
+	*
+	*
+	***************************************************/
+	void dealloc(DATtype &);
+
 	friend class TestLevel_0;
 
-	void VerifyAndAddExt(string &);
 
 };
 

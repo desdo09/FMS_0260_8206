@@ -232,7 +232,7 @@ public:
 	*
 	*
 	***************************************************/
-	void allocextend(DATtype &, uint, uint);
+	void allocextend(DATtype &, uint, AlgorithmType);
 
 	/*************************************************
 	* FUNCTION

@@ -333,6 +333,8 @@ void Disk::format(string & owner)
 
 int Disk::howmuchempty()
 {
+	return dat.dat.count();
+
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "howmuchempty");
 	int count;
@@ -375,4 +377,39 @@ void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 		dat.dat.set(index + i, 1);
 	}
 
+}
+
+void Disk::allocextend(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
+{
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "howmuchempty");
+
+	if (howmuchempty()>sectoresAmount)
+		throw ProgramExeption("No space left", "howmuchempty");
+	int index;
+
+	switch (algo)
+	{
+	case Disk::first_Fit:
+		index = firstFit(sectoresAmount);
+		break;
+	case Disk::best_Fit:
+		index = bestFit(sectoresAmount);
+		break;
+	case Disk::worst_Fit:
+		index = worstFit(sectoresAmount);
+		break;
+	default:
+		break;
+	}
+
+	for (int i = 0; i < sectoresAmount; i++)
+	{
+		FAT.set(index + i, 0);
+		dat.dat.set(index + i, 1);
+	}
+}
+
+void Disk::dealloc(DATtype &)
+{
 }

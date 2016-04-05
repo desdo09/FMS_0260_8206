@@ -5,22 +5,22 @@
 
 class VolumeHeader
 {
-private:
+	private:
 	
-	uint sectorNr; //index of sector
-	char diskName[12] = ""; //name of the disk
-	char diskOwner[12] = ""; //name of the disk owner
-	char prodDate[10] = ""; //production date
-	uint clusQty; // numbers of total clusters
-	uint dataClusQty; //number of cluster with data
-	uint addrDAT; // sector adress where the dat is
-	uint addrRootDir;// sector adress of the first one
-	uint addrDATcpy; //copy of the addroot
-	uint addrRootDirCpy;//copy of the root directory adress
-	uint addrDataStart;
-	char formatDate[10] = "";
-	bool isFormated;
-	char emptyArea[944] ="";
+		uint sectorNr;						
+		char diskName[12] = "";				
+		char diskOwner[12] = "";			
+		char prodDate[10] = "";				
+		uint clusQty;						
+		uint dataClusQty;					   
+		uint addrDAT;						
+		uint addrRootDir;					
+		uint addrDATcpy;					
+		uint addrRootDirCpy;				   
+		uint addrDataStart;					   
+		char formatDate[10] = "";			
+		bool isFormated;					   
+		char emptyArea[944] ="";			
 	//addrDATcpy
 
 public:
@@ -47,7 +47,7 @@ public:
 	void SetformaDate(string);
 	void SetisFormated(bool);
 
-	void Start();
+	void Set();
 
 #pragma endregion
 

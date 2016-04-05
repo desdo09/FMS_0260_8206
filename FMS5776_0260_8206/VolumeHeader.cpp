@@ -39,7 +39,7 @@ void VolumeHeader::SetisFormated(bool flag)
 	this->isFormated = flag;
 }
 
-void VolumeHeader::Start()
+void VolumeHeader::Set()
 {
 	this->sectorNr = 0;														     	// Volume Header sector index 								
 	_strdate(this->prodDate);														// The current date

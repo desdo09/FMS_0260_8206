@@ -32,7 +32,7 @@ Disk::Disk(string fileName, string Owner, ConstructorCod cod)
 
 Disk::~Disk()
 {
-	dskfl.close();
+	
 }
 
 
@@ -54,34 +54,35 @@ void Disk::createdisk(string diskName, string owner) {
 	
 	VerifyAndAddExt(diskName);													
 	
-	dskfl.open(diskName.c_str(),  ios::out, ios::binary);						// Create and open the file with the name receive
+	dskfl.open(diskName.c_str(),  ios::out| ios::binary);						// Create and open the file with the name receive
 	
 	
 	if (!dskfl.is_open()) {														// In case of error
 		throw ProgramExeption("Error to open the file!");						// throw an exception
 	}
-	
-	for (int i = 0; i < amountOfSectors; i++)									// Load the number of sectors defined on header into the file
-	{
-		Sector temp(i);															// Each sector get his index  
-		dskfl.write((char *)&temp, sizeof(Sector));								// write sector into the file (disk)
-	}
 
-	dskfl.flush();
-	
-	dskfl.seekp(ios::beg);														// Return the dskfl to the begin of the file 	
-										
-	vhd.SetdiskName(diskName.substr(0,diskName.length() - extensionLenght));	// Set the disk name into volume header
+	Sector temp;
+	for (int i = 0; i < amountOfSectors * 2; i++)								// Load the number of sectors defined on header into the file
+	{
+		temp.setSectorNr(i);													// Each sector get his index  
+		dskfl.write((char *)&temp, sizeof(Sector));								// write sector into the file (disk)
+		
+		
+	}
+	//dskfl.flush();
+
+	vhd.SetdiskName(diskName.substr(0, diskName.length() - extensionLenght));	// Set the disk name into volume header
 
 	vhd.SetdiskOwner(owner);													// Set the owner name into volume header
 
-	vhd.Start();
+	vhd.Set();
 
+	dskfl.seekp(0, ios::beg);													// Return the dskfl to the begin of the file 	
 	dskfl.write((char *)&vhd, sizeof(Sector));									// Write the volume header into the disk
-
 	dskfl.write((char *)&dat, sizeof(Sector));									// Write the DAT into the disk
-
-	dskfl.flush();
+	
+	dskfl.close();
+	//dskfl.flush();
 
 	
 	//File doesn't closed
@@ -97,9 +98,12 @@ void Disk::mountdisk(string  fileName)
 	if(dskfl.is_open())
 		dskfl.close();
 
+
 	VerifyAndAddExt(fileName);
 
-	this->dskfl.open(fileName, ios::in, ios::binary);
+	dskfl.open(fileName, ios::binary | ios::out | ios::in);
+	
+	dskfl.seekp(0, ios::beg);													// Return the dskfl to the begin of the file 	
 
 	if(!dskfl.good())
 			throw "File cannot be opened";
@@ -117,10 +121,10 @@ void Disk::mountdisk(string  fileName)
 void Disk::unmountdisk()
 {
 	if(!this->mounted)														
-		throw new exception("No disk mounted");
+		throw ProgramExeption("No disk mounted");
 
-	if (!dskfl.good())
-		throw new exception("Disk problems, file are not opened");
+	if (!dskfl.is_open())
+		throw ProgramExeption("Disk problems, file are not opened");
 
 	seekToSector(0);
 
@@ -145,7 +149,7 @@ void Disk::recreatedisk(string diskName)
 	if (dskfl.is_open())														// In case that is another file opened
 		dskfl.close();															// close it
 
-	dskfl.open(diskName.c_str(), ios::out, ios::binary);						// Create and open the file with the name receive
+	dskfl.open(diskName.c_str(), ios::out | ios::in |ios::binary);				// Create and open the file with the name receive
 
 	seekToSector(0);															
 	

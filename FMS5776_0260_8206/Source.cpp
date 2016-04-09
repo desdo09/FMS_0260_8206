@@ -1,114 +1,134 @@
+#pragma once
 #include "Disk.h"
+#include "TestLevel_0.h"
 
+enum { testLevel0 = 1, createDisk, mountDisk, unmountDisk, printDiskDetails, printDat, alocate, dealocate, clear };
 
-class TestLevel_0
-{
-	static void printStructSize()
-	{
-		cout << "start" << endl;
-		cout << "Size Of Disk -->" << sizeof(Disk) << endl;
-		cout << "Size Of Sector -->" << sizeof(Sector) << endl;
-		cout << "Size Of VolumeHeader -->" << sizeof(VolumeHeader) << endl;
-		cout << "Size Of DAT -->" << sizeof(DAT) << endl;
-		cout << "Size Of DirEntry -->" << sizeof(DirEntry) << endl;
-		cout << "Size Of SectorDir -->" << sizeof(SectorDir) << endl;
-		cout << "Size Of FileHeader -->" << sizeof(FileHeader) << endl;
-
-		cout << "Size Of RootDir -->" << sizeof(RootDir) << endl;
-	}
-
-	static void printDiskInfo(Disk& d)
-	{
-		VolumeHeader* vh = &d.vhd;
-
-		cout << "	disk name:        " << vh->diskName << endl;
-		cout << "	Owner Name:       " << vh->diskOwner << endl;
-		cout << "	prodDate:         " << vh->prodDate << endl;
-		cout << "	formatDate:       " << vh->formatDate << endl;
-		cout << "	isFormated:       " << vh->isFormated << endl;
-		cout << "	addrDataStart:    " << vh->addrDataStart << endl;
-
-		cout << "	ClusQty:          " << vh->clusQty << endl;
-		cout << "	dataClusQty:      " << vh->dataClusQty << endl;
-
-		cout << "	addrDAT:          " << vh->addrDAT << endl;
-		cout << "	addrRootDir:      " << vh->addrRootDir << endl;
-		cout << "	addrDATcpy:       " << vh->addrDATcpy << endl;
-		cout << "	addrRootDirCpy:   " << vh->addrRootDirCpy << endl << endl;
-
-	}
-
-	static void test_create(string diskName, string ownerName)
-	{
-		Disk d;
-		cout << "\npre createdisk: " << endl;
-		printDiskInfo(d);
-		cout << "post createdisk: " << endl;
-		d.createdisk(diskName, ownerName);
-		printDiskInfo(d);
-	}
-
-	static void test_mount(string diskName)
-	{
-		Disk d;
-		cout << "\npre mountdisk: " << endl;
-		printDiskInfo(d);
-		d.mountdisk(diskName);
-		cout << "post mountdisk: " << endl;
-		printDiskInfo(d);
-		d.unmountdisk();
-	}
-
-
-	static void test_rwSector(string diskName)
-	{
-		Disk d;
-		Sector sector;
-		d.mountdisk(diskName);
-
-		cout << "\nread sector: " << endl;
-		d.readSector(8, &sector);
-		strcpy_s(sector.rawData, "this is write temp sector");
-		d.writeSector(8, &sector);
-		d.unmountdisk();
-
-	}
-
-public:
-	static void test_0()
-	{
-
-		string diskName = "TheDisk";
-		string ownerName = "Da&Jo";
-
-		printStructSize();
-		test_create(diskName, ownerName);
-		test_mount(diskName);
-
-	}
-};
+DATtype testLevel1(Disk * d);
+ void DATprint(DATtype DAT,char type = 'D');
 
 void main() {
-
-	try
-	{
-		TestLevel_0 a;
-
-		a.test_0();
+	char choice[3];
+	TestLevel_0 a;
+	Disk * disk = &a.d;
+	DATtype FAT;
+	do {
+		try
+		{
 		
-	}
-	catch (exception ex)
+		
+
+
+			cout << "Select option:" << endl;
+			cout << "1 - Test level 0" << endl;
+			cout << "2 - Create disk" << endl;
+			cout << "3 - Mount Disk" << endl;
+			cout << "4 - Unmount Disk" << endl;
+			cout << "5 - Print disk details" << endl;
+			cout << "6 - Print DAT" << endl;
+			cout << "7 - Allocate sectors" << endl;
+			cout << "8 - Deallocate last FAT" << endl;
+			cout << "9 - Clear screen" << endl;
+			cout << "0 - Exit" << endl;
+
+			cout << "your choice: ";
+
+
+			cin >> choice;
+
+
+
+			switch (atoi(choice))
+			{
+			case createDisk:
+				a.test_create();
+				break;
+			case mountDisk:
+				a.test_mount();
+				break;
+			case unmountDisk:
+				disk->unmountdisk();
+				cout << "unmounted!" << endl;
+				break;
+			case printDiskDetails:
+				a.printDiskInfo();
+				break;
+			case testLevel0:
+				a.test_0();
+				break;
+			case alocate:
+				FAT = testLevel1(disk);
+				break;
+			case dealocate:
+				disk->dealloc(FAT);
+				cout << "deallocated! " << endl;
+				break;
+			case printDat:
+				DATprint(disk->getDatDAt());
+				break;
+
+			case clear: system("cls"); break;
+			default:
+				break;
+			}
+
+
+
+
+
+		}
+		catch (exception ex)
+		{
+			cout << ex.what() << endl;
+		}
+		catch (char * msg)
+		{
+			string err(msg);
+			cout << err << endl;
+		}
+		catch (...)
+		{
+			cout << "Error" << endl;
+		}
+	} while (choice != 0);
+
+	system("pause");
+}
+
+DATtype testLevel1(Disk * d)
+{
+	short algo;
+	int amount;
+	DATtype FAT;
+	cout << "Insert amount of sector to allocate:" << endl;
+	cin >> amount;
+	cout << "Select algorithm type" << endl;
+	do {
+		cout << "<1>First fit <2> Best Fit <3> Worst Fit" << endl;
+		cin >> algo;
+	} while (algo <= 0 && algo > 4);
+	d->alloc(FAT, amount, (Disk::AlgorithmType)algo);
+	cout << "FAT:" << endl;
+	DATprint(FAT,'F');
+
+	return FAT;
+}
+
+
+void DATprint(DATtype DAT, char type)
+{
+	for (int i = 0; i < amountOfSectors; i++)
 	{
-		cout << ex.what() << endl;
+		if (type == 'D' && DAT[i] || type != 'D' && !DAT[i])
+			cout << (char)219;
+		else
+			cout << (char)176;
+
+		cout << '|';
+
+		if (!((i + 1) % 50))
+			cout << endl;
 	}
-	catch (char * msg)
-	{
-		string err(msg);
-		cout << err << endl;
-	}
-	catch (...)
-	{
-		cout << "Error" << endl;
-	}
-	cin.get();
+	cout << endl;
+
 }

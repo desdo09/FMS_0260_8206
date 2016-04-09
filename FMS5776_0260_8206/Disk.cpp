@@ -80,11 +80,14 @@ void Disk::createdisk(string diskName, string owner) {
 	vhd.SetdiskOwner(owner);													// Set the owner name into volume header
 
 	vhd.Set();
-
+	dat.dat[800] = 0;
 	dskfl.seekp(0, ios::beg);													// Return the dskfl to the begin of the file 	
 	dskfl.write((char *)&vhd, sizeof(Sector));									// Write the volume header into the disk
 	dskfl.write((char *)&dat, sizeof(Sector));									// Write the DAT into the disk
+	dskfl.seekp(80* sizeof(Sector), ios::beg);									// Return the dskfl to the begin of the file 
 	
+	dskfl.write((char *)&dat, sizeof(Sector));									// Write the DAT into the disk
+
 	dskfl.close();
 
 
@@ -249,11 +252,11 @@ void Disk::VerifyAndAddExt(string & file)
 /*Private functions*/
 uint Disk::firstFit(uint sectoresAmount)
 {
-	int index;
+	int index = -1;
 	int temp = sectoresAmount;
 	for (int i = 4; i < amountOfSectors; i++)
 	{
-		if (dat.dat[i])
+		if (!dat.dat[i])
 			temp = sectoresAmount;
 		else
 			temp--;
@@ -269,26 +272,28 @@ uint Disk::firstFit(uint sectoresAmount)
  
 uint Disk::bestFit(uint sectoresAmount)
 {
-	int index =-1;
+	int index = -1;
 	int temp = sectoresAmount;
-	int big;
+	int small = 1600;
 	for (int i = 4; i < amountOfSectors; i++)
 	{
-		if (dat.dat[i])
+		if (!dat.dat[i] || i == amountOfSectors -1)
 		{
-			if (temp <= 0 && big<temp*(-1))
+			if (temp <= 0 && small>temp*(-1))
 			{
-				big = temp*(-1);
-				index = i - sectoresAmount + temp;
+				small = temp*(-1);
+				index = i - sectoresAmount - small;
 			}
 			temp = sectoresAmount;
-			
+
 		}
 		else
 			temp--;
 	}
-	
+
 	return index;
+
+	
 
 }
 
@@ -296,15 +301,15 @@ uint Disk::worstFit(uint sectoresAmount)
 {
 	int index = -1;
 	int temp = sectoresAmount;
-	int small;
+	int big =0;
 	for (int i = 4; i < amountOfSectors; i++)
 	{
-		if (dat.dat[i])
+		if (!dat.dat[i] || i == amountOfSectors - 1)
 		{
-			if (temp <= 0 && small>temp*(-1))
+			if (temp <= 0 && big<temp*(-1))
 			{
-				small = temp*(-1);
-				index = i - sectoresAmount + temp;
+				big = temp*(-1);
+				index = i - sectoresAmount - big;
 			}
 			temp = sectoresAmount;
 
@@ -334,7 +339,7 @@ void Disk::format(string & owner)
 int Disk::howmuchempty()
 {
 	return dat.dat.count();
-
+	/*
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "howmuchempty");
 	int count;
@@ -344,7 +349,7 @@ int Disk::howmuchempty()
 			count++;
 	}
 	return count;
-
+	*/
 }
 
 void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
@@ -352,9 +357,10 @@ void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "howmuchempty");
 
-	if(howmuchempty()>sectoresAmount)
+	if(howmuchempty()<sectoresAmount)
 		throw ProgramExeption("No space left", "howmuchempty");
-	int index;
+
+	int index =0;
 
 	switch (algo)
 	{
@@ -371,10 +377,18 @@ void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 		break;
 	}
 
-	for (int i = 0; i < sectoresAmount; i++)
+	if (index == -1)
 	{
-		FAT.set(index + i, 0);
-		dat.dat.set(index + i, 1);
+		this->alloc(FAT, sectoresAmount--, algo);
+		this->alloc(FAT, 1, algo);
+	}
+	else {
+
+		for (int i = 0; i < sectoresAmount; i++)
+		{
+			FAT.set(index + i, 1);
+			dat.dat.set(index + i, 0);
+		}
 	}
 
 }
@@ -402,7 +416,7 @@ void Disk::allocextend(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 	default:
 		break;
 	}
-
+	
 	for (int i = 0; i < sectoresAmount; i++)
 	{
 		FAT.set(index + i, 0);
@@ -410,6 +424,9 @@ void Disk::allocextend(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 	}
 }
 
-void Disk::dealloc(DATtype &)
+void Disk::dealloc(DATtype & FAT)
 {
+	for (int i = 0; i < amountOfSectors; i++)
+		if (FAT[i])
+			dat.dat[i] = 1;
 }

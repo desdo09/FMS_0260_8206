@@ -1,3 +1,4 @@
+#pragma once
 #include"Header.h"
 #include "VolumeHeader.h"
 #include "Dir.h"
@@ -28,7 +29,8 @@ public:
 		Mount = 'm',
 		
 	};
-	enum AlgorithmType { first_Fit, best_Fit, worst_Fit};
+	enum AlgorithmType { first_Fit=1, best_Fit, worst_Fit};
+	DATtype  getDatDAt() { return dat.Getdat(); }
 	/*************************************************
 	* CONSTRUCTOR
 	*    Default constructor
@@ -206,14 +208,22 @@ public:
 	/*************************************************
 	* FUNCTION
 	*
+	*	Allocate sectors into the DAT
+	*
 	* PARAMETERS
+	*
+	*	The FAT            - Type: DATtype
+	*	The amount         - Type: unsigned int
+	*	The algorithm type - Type: Disk::AlgorithmType
 	*
 	* RETURN VALUE
 	*
+	*	The function does not return a value
 	*
 	* MEANING
-	*
-	*
+	*	
+	*	The function will allocate the numbers of sectors into the DAT 
+	*	with the algorithm request by the user. 
 	***************************************************/
 	void alloc(DATtype &, uint, AlgorithmType);
 

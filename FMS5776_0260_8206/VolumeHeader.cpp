@@ -29,9 +29,9 @@ void VolumeHeader::SetprodDate(string date)
 	memccpy(diskName, date.c_str(), 0, 12);
 }
 
-void VolumeHeader::SetformaDate(string date)
+void VolumeHeader::SetformaDate()
 {
-	memccpy(diskName, date.c_str(), 0, 12);
+	_strdate(formatDate);
 }
 
 void VolumeHeader::SetisFormated(bool flag)

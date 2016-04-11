@@ -22,10 +22,7 @@ public:
 		string ownerName = owner;
 	}
 
-	~TestLevel_0()
-	{
-		cout << "\n\n\n\nDTOR\n\n\n\n\n";
-	}
+	
 
 	void printStructSize()
 	{

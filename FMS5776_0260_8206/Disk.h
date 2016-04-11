@@ -18,9 +18,9 @@ private:
 	uint          currDiskSectorNr;
 	char          buffer[sizeof(Sector)];
 	
-	uint firstFit(uint);
-	uint bestFit(uint);
-	uint worstFit(uint);
+	uint firstFit(uint, uint);
+	uint bestFit(uint, uint);
+	uint worstFit(uint, uint);
 
 public:
 	enum ConstructorCod
@@ -30,7 +30,10 @@ public:
 		
 	};
 	enum AlgorithmType { first_Fit=1, best_Fit, worst_Fit};
+
+	bool getMounted() { return mounted; }
 	DATtype  getDatDAt() { return dat.Getdat(); }
+
 	/*************************************************
 	* CONSTRUCTOR
 	*    Default constructor
@@ -203,7 +206,7 @@ public:
 	*
 	*
 	***************************************************/
-	int howmuchempty();
+	int howmuchempty(uint);
 
 	/*************************************************
 	* FUNCTION
@@ -257,6 +260,19 @@ public:
 	*
 	***************************************************/
 	void dealloc(DATtype &);
+
+	void flush();
+
+
+	/*************************************************
+	*
+	*				  Level 2
+	*
+	**************************************************/
+
+	void createfile(string & , string & , bool , uint , uint , string & , uint , uint );
+
+	
 
 	friend class TestLevel_0;
 

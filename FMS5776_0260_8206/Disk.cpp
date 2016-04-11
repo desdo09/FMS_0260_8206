@@ -332,19 +332,14 @@ void Disk::format(string & owner)
 
 }
 
+
+
+
 int Disk::howmuchempty()
 {
 	return dat.dat.count();
 
-	if (!this->mounted)
-		throw ProgramExeption("There is not mounted disk", "howmuchempty");
-	int count;
-	for (int i = 0; i < amountOfSectors; i*=2)
-	{
-		if (!dat.dat[i] & !dat.dat[i + 1])
-			count++;
-	}
-	return count;
+	
 
 }
 

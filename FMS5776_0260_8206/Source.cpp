@@ -2,16 +2,21 @@
 #include "Disk.h"
 #include "TestLevel_0.h"
 
-enum { testLevel0 = 1, createDisk, mountDisk, unmountDisk, printDiskDetails, printDat, alocate, dealocate, clear };
+enum menu{ clear = 1, testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails, printDat, formatDisk, allocate, allocateext, deallocate };
 
-DATtype testLevel1(Disk * d);
+void testLevel1(Disk * d, DATtype & FAT, bool ext = false);
  void DATprint(DATtype DAT,char type = 'D');
 
 void main() {
-	char choice[3];
+	//system("color a");
+	char choice[3],ans;
 	TestLevel_0 a;
 	Disk * disk = &a.d;
 	DATtype FAT;
+	for (int i = 25; i < 50; i++)
+	{
+		FAT[i] = 1;
+	}
 	do {
 		try
 		{
@@ -20,24 +25,30 @@ void main() {
 
 
 			cout << "Select option:" << endl;
-			cout << "1 - Test level 0" << endl;
-			cout << "2 - Create disk" << endl;
-			cout << "3 - Mount Disk" << endl;
-			cout << "4 - Unmount Disk" << endl;
-			cout << "5 - Print disk details" << endl;
-			cout << "6 - Print DAT" << endl;
-			cout << "7 - Allocate sectors" << endl;
-			cout << "8 - Deallocate last FAT" << endl;
-			cout << "9 - Clear screen" << endl;
-			cout << "0 - Exit" << endl;
+			cout << "\n\t\t<0> Exit " << endl;
+			cout << "\t\t<1> Clear screen " << endl;
+			cout << "\n\tLevel 0:" << endl;
+			cout << "\t\t<2> Test level 0 " << endl;
+			cout << "\t\t<3> Create disk " << endl;
+			cout << "\t\t<4> Mount Disk " << endl;
+			cout << "\t\t<5> Unmount Disk " << endl;
+			cout << "\t\t<6> Release data into the Disk " << endl;
+			cout << "\t\t<7> Print disk details " << endl;
+			cout << "\n\tLevel 1:" << endl;
+			cout << "\t\t<8> Print DAT " << endl;
+			cout << "\t\t<9> Format Disk " << endl;
+			cout << "\t\t<10> Allocate sectors " << endl;
+			cout << "\t\t<11> Allocate last FAT " << endl;
+			cout << "\t\t<12> Deallocate last FAT " << endl;
+			
 
-			cout << "your choice: ";
+			cout << "\nYour choice: [    ]\b\b\b\b";
 
 
 			cin >> choice;
 
 
-
+			cout << "**************************************************" << endl;
 			switch (atoi(choice))
 			{
 			case createDisk:
@@ -50,30 +61,50 @@ void main() {
 				disk->unmountdisk();
 				cout << "unmounted!" << endl;
 				break;
+			case menu::flush:
+				disk->flush();
+				break;
+			case formatDisk:
+				cout << "are you sure <Y/N>? " << endl;
+				cin >> ans;
+				if (ans == 'Y' || ans == 'y')
+				{
+					disk->format(a.ownerName);
+					cout << "Disk formated!" << endl;
+				}
+				break;
 			case printDiskDetails:
 				a.printDiskInfo();
 				break;
 			case testLevel0:
 				a.test_0();
 				break;
-			case alocate:
-				FAT = testLevel1(disk);
+			case allocate:
+				FAT.reset();
+				testLevel1(disk,FAT);
 				break;
-			case dealocate:
+			case allocateext:
+				testLevel1(disk, FAT,true);
+				break;
+			case deallocate:
 				disk->dealloc(FAT);
 				cout << "deallocated! " << endl;
 				break;
 			case printDat:
-				DATprint(disk->getDatDAt());
+				if (disk->getMounted())
+					DATprint(disk->getDatDAt());
+				else
+					cout << "There is not a mounted disk" << endl;
 				break;
 
-			case clear: system("cls"); break;
+			case clear: std::system("cls"); break;
 			default:
 				break;
 			}
 
 
-
+		
+			cin.get();
 
 
 		}
@@ -90,16 +121,22 @@ void main() {
 		{
 			cout << "Error" << endl;
 		}
-	} while (choice != 0);
 
-	system("pause");
+		if(atoi(choice) != 1 )
+			cout << "**************************************************" << endl;
+
+
+	} while (atoi(choice) != 0);
+
+	std::system("pause");
+
+	delete[] choice;
 }
 
-DATtype testLevel1(Disk * d)
+void testLevel1(Disk * d, DATtype & FAT ,bool ext)
 {
 	short algo;
 	int amount;
-	DATtype FAT;
 	cout << "Insert amount of sector to allocate:" << endl;
 	cin >> amount;
 	cout << "Select algorithm type" << endl;
@@ -107,16 +144,21 @@ DATtype testLevel1(Disk * d)
 		cout << "<1>First fit <2> Best Fit <3> Worst Fit" << endl;
 		cin >> algo;
 	} while (algo <= 0 && algo > 4);
-	d->alloc(FAT, amount, (Disk::AlgorithmType)algo);
+	if (ext)
+		d->allocextend(FAT, amount, (Disk::AlgorithmType)algo);
+	else
+		d->alloc(FAT, amount, (Disk::AlgorithmType)algo);
+
 	cout << "FAT:" << endl;
 	DATprint(FAT,'F');
 
-	return FAT;
+	
 }
 
 
 void DATprint(DATtype DAT, char type)
 {
+	
 	for (int i = 0; i < amountOfSectors; i++)
 	{
 		if (type == 'D' && DAT[i] || type != 'D' && !DAT[i])

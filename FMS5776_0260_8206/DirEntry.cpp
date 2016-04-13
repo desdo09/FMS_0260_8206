@@ -4,6 +4,8 @@
 
 DirEntry::DirEntry()
 {
+	entryStatus = 0;
+	memcpy(filename, "RootDir", 7);
 }
 
 

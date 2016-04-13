@@ -1,6 +1,7 @@
 #pragma once
 #include "Header.h"
 #include "DAT.h"
+#include "FileHeader.h"
 
 class Sector
 {
@@ -15,6 +16,7 @@ private:
 public:
 	Sector(uint);
 	Sector(DAT *);
+	Sector(FileHeader *);
 	Sector(const void * x);
 	Sector();
 	~Sector();

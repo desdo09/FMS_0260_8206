@@ -18,10 +18,18 @@ class DirEntry
 	unsigned short entryStatus;	// 0 - empty 1 - Active 2- inactive
 
 
-
 public:
 	DirEntry();
 	~DirEntry();
+
+	/*************************************************
+	*
+	*				 Friends
+	*
+	**************************************************/
 	friend class Disk;
+	friend class FileHeader;
+	friend class SectorDir;
+	friend class TestLevel_2;
 };
 

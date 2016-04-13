@@ -8,10 +8,14 @@ class FileHeader
 	DirEntry fileDesc;							// File descriptor
 	DATtype FAT;								// FAT
 	char emptyArea[1024-8-72-sizeof(DATtype)];	
-public:
 	
+public:
 	FileHeader();
 	~FileHeader();
+
+	DATtype getFAT() { return FAT; }
+
 	friend class Disk;
+
 };
 

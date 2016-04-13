@@ -1,11 +1,16 @@
 #pragma once
 #include "Disk.h"
 #include "TestLevel_0.h"
+#include "TestLevel_2.h"
 
-enum menu{ clear = 1, testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails, printDat, formatDisk, allocate, allocateext, deallocate };
+enum menu{ clear = 1,																			 // Others
+			testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails,            // Level 0
+			printDat, formatDisk, allocate, allocateext, deallocate,							 // Level 1
+			createFile, getFile, extendFile, ShowFileFAT, deleteFile							 // Level 2
+		 };
 
 void testLevel1(Disk * d, DATtype & FAT, bool ext = false);
- void DATprint(DATtype DAT,char type = 'D');
+void DATprint(DATtype DAT,char type = 'D');
 
 void main() {
 	//system("color a");
@@ -22,8 +27,7 @@ void main() {
 		{
 		
 		
-
-
+			
 			cout << "Select option:" << endl;
 			cout << "\n\t\t<0> Exit " << endl;
 			cout << "\t\t<1> Clear screen " << endl;
@@ -40,7 +44,12 @@ void main() {
 			cout << "\t\t<10> Allocate sectors " << endl;
 			cout << "\t\t<11> Allocate last FAT " << endl;
 			cout << "\t\t<12> Deallocate last FAT " << endl;
-			
+			cout << "\n\tLevel 2:" << endl;
+			cout << "\t\t<13> Create new file " << endl;
+			cout << "\t\t<14> Get file header" << endl;
+			cout << "\t\t<15> Extend File " << endl;
+			cout << "\t\t<16> Get FAT from a file " << endl;
+			cout << "\t\t<17> Delete File " << endl;
 
 			cout << "\nYour choice: [    ]\b\b\b\b";
 
@@ -96,7 +105,22 @@ void main() {
 				else
 					cout << "There is not a mounted disk" << endl;
 				break;
-
+			case createFile: 
+				TestLevel_2::createFile(disk);
+				break;
+			case extendFile:
+				TestLevel_2::extFile(disk);
+				break;
+			case getFile:
+				TestLevel_2::printHeader(disk);
+				break;
+			case deleteFile:
+				TestLevel_2::DeleteFile(disk);
+				break;
+			case ShowFileFAT:
+				FAT = TestLevel_2::getFAT(disk);
+				DATprint(FAT,'F');
+				break;
 			case clear: std::system("cls"); break;
 			default:
 				break;
@@ -130,7 +154,7 @@ void main() {
 
 	std::system("pause");
 
-	delete[] choice;
+	
 }
 
 void testLevel1(Disk * d, DATtype & FAT ,bool ext)
@@ -154,7 +178,6 @@ void testLevel1(Disk * d, DATtype & FAT ,bool ext)
 
 	
 }
-
 
 void DATprint(DATtype DAT, char type)
 {

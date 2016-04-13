@@ -4,29 +4,37 @@
 
 class SectorDir
 {
-
+private:
+	int sectorNr;
+	DirEntry dirEntry[14];
+	char unUse[12];
 
 public:
 	SectorDir();
 	~SectorDir();
 
-private:
-	int sectorNr;
-	DirEntry dirEntry[14];
-	char unUse[12];
+	short findNextIndex();
+	bool  fileExist(const char *);
+	short findDirByName(const char *);
+
+	friend class Disk;
+	friend class RootDir;
 
 
 };
 
 class RootDir
 {
-
+private:
+	SectorDir root;
+	
 public:
 	RootDir();
 	~RootDir();
 
-private:
-	SectorDir msbSector;
-	SectorDir lsbSector;
+
+
+	friend class Disk;
+
 };
 

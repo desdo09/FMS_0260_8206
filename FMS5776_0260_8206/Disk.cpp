@@ -283,7 +283,7 @@ void Disk::VerifyAndAddExt(string & file)
 **************************************************/
 
 /*Private functions*/
-uint Disk::firstFit(uint sectoresAmount, uint indexStart = 4)
+uint Disk::firstFit(uint sectoresAmount, uint indexStart = 0)
 {
 	int index = -1;
 	int temp = sectoresAmount;
@@ -303,7 +303,7 @@ uint Disk::firstFit(uint sectoresAmount, uint indexStart = 4)
 	return index;
 }
 
-uint Disk::bestFit(uint sectoresAmount, uint indexStart = 4)
+uint Disk::bestFit(uint sectoresAmount, uint indexStart = 0)
 {
 	int index = -1;
 	int temp = sectoresAmount;
@@ -333,7 +333,7 @@ uint Disk::bestFit(uint sectoresAmount, uint indexStart = 4)
 
 }
 
-uint Disk::worstFit(uint sectoresAmount, uint indexStart = 4)
+uint Disk::worstFit(uint sectoresAmount, uint indexStart = 0)
 {
 	int index = -1;
 	int temp = sectoresAmount;
@@ -709,6 +709,8 @@ void Disk::delfile(string & fileName, string & owner)
 	dealloc(fh.FAT);
 
 	seekToSector(dir->fileAddr);
+
+	dir->entryStatus = 2;
 
 	this->flush();
 }

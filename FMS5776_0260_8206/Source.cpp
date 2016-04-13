@@ -3,7 +3,7 @@
 #include "TestLevel_0.h"
 #include "TestLevel_2.h"
 
-enum menu{ clear = 1,																			 // Others
+enum menu{	clear = 1,																			 // Others
 			testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails,            // Level 0
 			printDat, formatDisk, allocate, allocateext, deallocate,							 // Level 1
 			createFile, getFile, extendFile, ShowFileFAT, deleteFile							 // Level 2
@@ -29,7 +29,7 @@ void main() {
 		
 			
 			cout << "Select option:" << endl;
-			cout << "\n\t\t<0> Exit " << endl;
+			cout << "\n\t\t<100> Exit " << endl;
 			cout << "\t\t<1> Clear screen " << endl;
 			cout << "\n\tLevel 0:" << endl;
 			cout << "\t\t<2> Test level 0 " << endl;
@@ -123,6 +123,7 @@ void main() {
 				break;
 			case clear: std::system("cls"); break;
 			default:
+				// std::system("cls");
 				break;
 			}
 
@@ -150,7 +151,7 @@ void main() {
 			cout << "**************************************************" << endl;
 
 
-	} while (atoi(choice) != 0);
+	} while (atoi(choice) != 100);
 
 	std::system("pause");
 

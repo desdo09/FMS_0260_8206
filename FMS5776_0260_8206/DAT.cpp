@@ -6,8 +6,8 @@ DAT::DAT()
 {
 	this->sectorNr = 1;															// DAT sector index 		
 	this->dat.set();															// Set all bits 1
-	for (int i = 0; i < 4; i++)													// Set The first 4 bits 0 
-		this->dat.set(i, 0);
+	dat[0] = 0;
+	dat[1] = 0;
 }
 
 
@@ -20,8 +20,8 @@ void DAT::resetDat()
 
 	this->sectorNr = 1;															// DAT sector index 		
 	this->dat.set();															// Set all bits 1
-	for (int i = 0; i < 4; i++)													// Set The first 4 bits 0 
-		this->dat.set(i, 0);
+	dat[0] = 0;																	// Sector for vhd and DAT
+	dat[1] = 0;																	// Sector for rootDir
 
 
 }

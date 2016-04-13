@@ -86,7 +86,7 @@ void main() {
 				a.printDiskInfo();
 				break;
 			case testLevel0:
-				a.test_0();
+				a.printStructSize();
 				break;
 			case allocate:
 				FAT.reset();

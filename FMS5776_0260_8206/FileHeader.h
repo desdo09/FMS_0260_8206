@@ -16,6 +16,7 @@ public:
 	DATtype getFAT() { return FAT; }
 
 	friend class Disk;
+	friend class TestLevel_2;
 
 };
 

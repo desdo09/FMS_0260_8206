@@ -26,7 +26,8 @@ public:
 class RootDir
 {
 private:
-	SectorDir root;
+	SectorDir msbSector;
+	SectorDir lsbSector;
 	
 public:
 	RootDir();

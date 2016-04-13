@@ -22,6 +22,9 @@
     <Filter Include="Resource Files\Pphysical layer">
       <UniqueIdentifier>{a2ba0160-536d-439e-8105-8688851eabb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Test class">
+      <UniqueIdentifier>{3b318ea0-150f-4920-b347-22b80bda8e07}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.h">
@@ -52,7 +55,10 @@
       <Filter>Program Files</Filter>
     </ClInclude>
     <ClInclude Include="TestLevel_0.h">
-      <Filter>Header Files\Physical layer</Filter>
+      <Filter>Header Files\Test class</Filter>
+    </ClInclude>
+    <ClInclude Include="TestLevel_2.h">
+      <Filter>Header Files\Test class</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

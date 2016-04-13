@@ -114,7 +114,6 @@ public:
 
 		DirEntry * dir = d->getDir(fileName);
 
-		FileHeader fh;
 
 		if (dir == NULL)
 		{
@@ -123,6 +122,7 @@ public:
 		}
 
 		
+		FileHeader fh;
 
 		cout << "FAT into address: " << dir->fileAddr << endl;
 
@@ -132,7 +132,9 @@ public:
 		d->dskfl.read((char *)&fh, sizeof(Sector));
 		
 		FAT = fh.getFAT();
-		
+	
+
+
 		return FAT;
 	}
 };

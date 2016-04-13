@@ -21,6 +21,8 @@ private:
 	uint firstFit(uint, uint);
 	uint bestFit(uint, uint);
 	uint worstFit(uint, uint);
+	int firstIndex(DATtype DAT, bool isDAT = true, uint indexStart = 0);
+	int lastIndex(DATtype DAT, bool isDAT = true);
 
 public:
 	enum ConstructorCod
@@ -206,7 +208,7 @@ public:
 	*
 	*
 	***************************************************/
-	int howmuchempty(uint);
+	uint howmuchempty(uint);
 
 	/*************************************************
 	* FUNCTION
@@ -270,12 +272,26 @@ public:
 	*
 	**************************************************/
 
-	void createfile(string & , string & , bool , uint , uint , string & , uint , uint );
+	void createfile(string & , string & , bool , uint , uint , string, uint , uint );
+
+	void extendfile(string &, string &, uint);
+	
+	void delfile(string &, string &);
+
+	DirEntry * getDir( const char * FileName);
+
+
+
+	/*************************************************
+	*
+	*				 Friends
+	*
+	**************************************************/
+	friend class TestLevel_0;
+	friend class TestLevel_2;
+
 
 	
-
-	friend class TestLevel_0;
-
 
 };
 

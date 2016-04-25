@@ -1,10 +1,11 @@
 #pragma once
-#include"Header.h"
+#include "Header.h"
 #include "VolumeHeader.h"
 #include "Dir.h"
 #include "DAT.h"
 #include "Sector.h"
 #include "FileHeader.h"
+#include "FCB.h"
 
 class Disk
 {
@@ -56,8 +57,7 @@ public:
 	};
 	enum AlgorithmType { first_Fit=1, best_Fit, worst_Fit};
 
-	bool getMounted() { return mounted; }
-	DATtype  getDatDAt() { return dat.Getdat(); }
+	
 
 	/*************************************************
 	* CONSTRUCTOR
@@ -87,6 +87,15 @@ public:
 	*
 	**************************************************/
 	~Disk();
+
+	/*************************************************
+	*
+	*				  Others functions
+	*
+	**************************************************/
+	bool getMounted() { return mounted; }
+	DATtype  getDatDAt() { return dat.Getdat(); }
+
 
 	/*************************************************
 	* 
@@ -498,6 +507,19 @@ public:
 	***************************************************/
 	DirEntry * getDir( const char * FileName);
 
+	FileHeader getFileHeader(DirEntry *);
+
+	/*************************************************
+	*
+	*				  Level 3
+	*
+	**************************************************/
+
+	int hi(int c) { return 0; }
+
+
+
+	FCB * openfile(string , string , FCB::typeToOpening );
 
 
 	/*************************************************
@@ -507,6 +529,7 @@ public:
 	**************************************************/
 	friend class TestLevel_0;
 	friend class TestLevel_2;
+	friend class FCB;
 
 
 	

@@ -31,5 +31,6 @@ public:
 	friend class FileHeader;
 	friend class SectorDir;
 	friend class TestLevel_2;
+	friend class FCB;
 };
 

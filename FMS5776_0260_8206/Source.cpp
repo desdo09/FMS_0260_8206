@@ -2,22 +2,26 @@
 #include "Disk.h"
 #include "TestLevel_0.h"
 #include "TestLevel_2.h"
+#include "FCB.h"
 
-enum menu{ clear = 1,																			 // Others
+enum menu{	clear = 1,																			 // Others
 			testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails,            // Level 0
 			printDat, formatDisk, allocate, allocateext, deallocate,							 // Level 1
-			createFile, getFile, extendFile, ShowFileFAT, deleteFile							 // Level 2
+			createFile, getFile, extendFile, ShowFileFAT, deleteFile,							 // Level 2
+			newFCB
 		 };
 
 void testLevel1(Disk * d, DATtype & FAT, bool ext = false);
 void DATprint(DATtype DAT,char type = 'D');
 
 void main() {
-	//system("color a");
+	system("color a");
 	char choice[3],ans;
 	TestLevel_0 a;
 	Disk * disk = &a.d;
 	DATtype FAT;
+	FAT.set();
+	FCB * fcb;
 	for (int i = 25; i < 50; i++)
 	{
 		FAT[i] = 1;
@@ -29,7 +33,7 @@ void main() {
 		
 			
 			cout << "Select option:" << endl;
-			cout << "\n\t\t<0> Exit " << endl;
+			cout << "\n\t\t<100> Exit " << endl;
 			cout << "\t\t<1> Clear screen " << endl;
 			cout << "\n\tLevel 0:" << endl;
 			cout << "\t\t<2> Test level 0 " << endl;
@@ -86,7 +90,7 @@ void main() {
 				a.printDiskInfo();
 				break;
 			case testLevel0:
-				a.test_0();
+				a.printStructSize();
 				break;
 			case allocate:
 				FAT.reset();
@@ -121,8 +125,17 @@ void main() {
 				FAT = TestLevel_2::getFAT(disk);
 				DATprint(FAT,'F');
 				break;
+			case newFCB: 
+				fcb = disk->openfile("File", "David", enumsFMS::FCBtypeToOpening::output);
+				if (fcb != NULL)
+					DATprint(fcb->FAT, 'F');
+				else
+					cout << "File doesn't exist" << endl;
+				break;
+
 			case clear: std::system("cls"); break;
 			default:
+				// std::system("cls");
 				break;
 			}
 
@@ -131,6 +144,11 @@ void main() {
 			cin.get();
 
 
+		}
+		catch (ProgramExeption ex)
+		{
+			cout << ex.Getsource() << ":" << endl;
+			cout << ex.what() << endl;
 		}
 		catch (exception ex)
 		{
@@ -150,10 +168,11 @@ void main() {
 			cout << "**************************************************" << endl;
 
 
-	} while (atoi(choice) != 0);
+	} while (atoi(choice) != 100);
 
 	std::system("pause");
 
+	delete(disk);
 	
 }
 

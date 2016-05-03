@@ -1,4 +1,5 @@
 #pragma once
+#include "header.h"
 #include "DirEntry.h"
 
 
@@ -26,7 +27,8 @@ public:
 class RootDir
 {
 private:
-	SectorDir root;
+	SectorDir msbSector;
+	SectorDir lsbSector;
 	
 public:
 	RootDir();

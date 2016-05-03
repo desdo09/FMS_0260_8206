@@ -34,7 +34,7 @@ public:
 		cout << "Size Of DirEntry -->" << sizeof(DirEntry) << endl;
 		cout << "Size Of SectorDir -->" << sizeof(SectorDir) << endl;
 		cout << "Size Of FileHeader -->" << sizeof(FileHeader) << endl;
-
+	//	cout<< "Size Of DAT -->" << sizeof(DAT) << endl;
 		cout << "Size Of RootDir -->" << sizeof(RootDir) << endl;
 	}
 

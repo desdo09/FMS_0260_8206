@@ -1,10 +1,11 @@
 #pragma once
-#include"Header.h"
+#include "Header.h"
 #include "VolumeHeader.h"
 #include "Dir.h"
 #include "DAT.h"
 #include "Sector.h"
 #include "FileHeader.h"
+#include "FCB.h"
 
 class Disk
 {
@@ -16,11 +17,34 @@ private:
 	bool          mounted;
 	fstream       dskfl;
 	uint          currDiskSectorNr;
-	char          buffer[sizeof(Sector)];
-	
+	Sector        buffer;
+
+
+	/*************************************************
+	*
+	*				Private function from
+	*						Level 1
+	*
+	**************************************************/
+	/*
+		Theses tree functions return the index of the 
+		first sector free to allocate according to the 
+		algorithm
+	*/
 	uint firstFit(uint, uint);
 	uint bestFit(uint, uint);
 	uint worstFit(uint, uint);
+
+	/*************************************************
+	*
+	*				Private function from
+	*						Level 2
+	*
+	**************************************************/
+
+	/*
+		Theses functions returns the first/last index of the FAT/DAT
+	*/
 	int firstIndex(DATtype DAT, bool isDAT = true, uint indexStart = 0);
 	int lastIndex(DATtype DAT, bool isDAT = true);
 
@@ -33,8 +57,7 @@ public:
 	};
 	enum AlgorithmType { first_Fit=1, best_Fit, worst_Fit};
 
-	bool getMounted() { return mounted; }
-	DATtype  getDatDAt() { return dat.Getdat(); }
+	
 
 	/*************************************************
 	* CONSTRUCTOR
@@ -64,6 +87,15 @@ public:
 	*
 	**************************************************/
 	~Disk();
+
+	/*************************************************
+	*
+	*				  Others functions
+	*
+	**************************************************/
+	bool getMounted() { return mounted; }
+	DATtype  getDatDAt() { return dat.Getdat(); }
+
 
 	/*************************************************
 	* 
@@ -131,7 +163,7 @@ public:
 	*   This function does not receive parameters
 	*
 	* RETURN VALUE
-	*	Returns the fstream object that opened the file
+	*	This function does not return parameters
 	*
 	* MEANING
 	*     This functions unmount this disk and unload
@@ -164,16 +196,108 @@ public:
 	***************************************************/
 	fstream * getdskfl();
 
+	/*************************************************
+	* FUNCTION
+	*   seekToSector
+	* PARAMETERS
+	*   The sector index
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function will seek the fstream object (dskfl)
+	*	to a sector
+	*
+	***************************************************/
 	void seekToSector(uint);
-	
+	/*************************************************
+	* FUNCTION
+	*   seekToSector
+	* PARAMETERS
+	*	The FAT file
+	*   The sector index
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function will seek the fstream object (dskfl)
+	*	to the sector asked through the FAT 
+	*
+	***************************************************/
+	void seekToSector(DATtype FAT,uint);
+	/*************************************************
+	* FUNCTION
+	*   writeSector
+	* PARAMETERS
+	*   The sector index - Type: unsigned int
+	*	A sector		 - Type: Sector
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function will seek to the sector index and
+	*	then write it. 
+	*
+	***************************************************/
 	void writeSector(uint, Sector*);
-
+	/*************************************************
+	* FUNCTION
+	*   writeSector
+	* PARAMETERS
+	*
+	*	A sector		 - Type: Sector
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function write a sector into the file.
+	*
+	***************************************************/
 	void writeSector(Sector *);
-
+	/*************************************************
+	* FUNCTION
+	*   readSector
+	* PARAMETERS
+	*   The sector index - Type: unsigned int
+	*	A sector		 - Type: Sector
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function will seek to the sector index and
+	*	then read the sector.
+	*
+	***************************************************/
 	void readSector(uint, Sector*);
-
+	/*************************************************
+	* FUNCTION
+	*   writeSector
+	* PARAMETERS
+	*	A sector		 - Type: Sector
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function read a sector from the file.
+	*
+	***************************************************/
 	void readSector(Sector *);
 
+	/*************************************************
+	* FUNCTION
+	*   writeSector
+	* PARAMETERS
+	*   The filename - Type: unsigned int
+	*
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function will check if the filename contain 
+	*	the program file extension. in case don't the
+	*	function will added it.
+	*
+	***************************************************/
 	void VerifyAndAddExt(string &);
 
 	/*************************************************
@@ -184,27 +308,30 @@ public:
 
 	/*************************************************
 	* FUNCTION
-	*   
+	*	format
 	* PARAMETERS
-	*  
+	*	The file name
 	* RETURN VALUE
-	*	
+	*	This function does not return any parameters
 	*
 	* MEANING
-	*    
+	*   The function will write the Rootdir and set
+	*	into volume header as  formated
 	*
 	***************************************************/
 	void format(string &);
 
 	/*************************************************
 	* FUNCTION
-	*
+	*	howmuchempty
 	* PARAMETERS
-	*
+	*	The index to start, the default is 0
 	* RETURN VALUE
-	*
+	*	how many sectors is free
 	*
 	* MEANING
+	*	the function will check the DAT and return how many 
+	*	sectors (clusters) is free to use;
 	*
 	*
 	***************************************************/
@@ -213,7 +340,7 @@ public:
 	/*************************************************
 	* FUNCTION
 	*
-	*	Allocate sectors into the DAT
+	*	alloc
 	*
 	* PARAMETERS
 	*
@@ -227,42 +354,72 @@ public:
 	*
 	* MEANING
 	*	
-	*	The function will allocate the numbers of sectors into the DAT 
-	*	with the algorithm request by the user. 
+	*	The function will allocate the numbers of 
+	*	sectors into the DAT and FAT, received from the 
+	*	user, with the algorithm request by the user. 
 	***************************************************/
 	void alloc(DATtype &, uint, AlgorithmType);
-
-
-
 
 	/*************************************************
 	* FUNCTION
 	*
+	*	allocextend
+	*
 	* PARAMETERS
+	*
+	*	The FAT            - Type: DATtype
+	*	The amount         - Type: unsigned int
+	*	The algorithm type - Type: Disk::AlgorithmType
 	*
 	* RETURN VALUE
 	*
+	*	The function does not return a value
 	*
 	* MEANING
 	*
+	*	As alloc the function will allocate the numbers of
+	*	sectors into the DAT and into the FAT that already 
+	*	contain data.
 	*
 	***************************************************/
 	void allocextend(DATtype &, uint, AlgorithmType);
 
 	/*************************************************
 	* FUNCTION
-	*
+	*	dealloc
 	* PARAMETERS
+	*	
+	*	The FAT
 	*
 	* RETURN VALUE
 	*
+	*	The function does not return a value
 	*
 	* MEANING
 	*
+	*	The function will take the FAT and deallocate
+	*	the sector used by the him, into the DAT.
 	*
 	***************************************************/
 	void dealloc(DATtype &);
 
+	/*************************************************
+	* FUNCTION
+	*	flush
+	* PARAMETERS
+	*	
+	*	The function does not receive a value
+	*
+	* RETURN VALUE
+	*
+	*	The function does not return a value
+	*
+	* MEANING
+	*
+	*	The function will release the data to the disk file 
+	*	(DAT, Volumen Header ,Rootdir)
+	*
+	***************************************************/
 	void flush();
 
 
@@ -272,14 +429,112 @@ public:
 	*
 	**************************************************/
 
+	/*************************************************
+	* FUNCTION
+	*
+	*	createfile
+	*
+	* PARAMETERS
+	*
+	*	The name				- Type: DATtype
+	*	The owner				- Type: unsigned int
+	*	If is dynamic			- Type: bool
+	*	The regSize				- Type: unsigned int
+	*	The Amount of sectors	- Type: unsigned int
+	*	The key type			- Type: string
+	*	The key offset			- Type: unsigned int
+	*	The offset size			- Type: unsigned int
+	*
+	* RETURN VALUE
+	*
+	*	The function does not return a value
+	*
+	* MEANING
+	*
+	*	The function will create a file header and then 
+	*	allocate the file into the disk.
+	*
+	***************************************************/
 	void createfile(string & , string & , bool , uint , uint , string, uint , uint );
-
+	/*************************************************
+	* FUNCTION
+	*
+	*	extendfile
+	*
+	* PARAMETERS
+	*
+	*	The name				- Type: DATtype
+	*	The owner				- Type: unsigned int
+	*	The Amount of sectors	- Type: unsigned int
+	*
+	* RETURN VALUE
+	*
+	*	The function does not return a value
+	*
+	* MEANING
+	*
+	*	The function will extend a file header through
+	*	allocext.
+	*
+	***************************************************/
 	void extendfile(string &, string &, uint);
-	
+
+	/*************************************************
+	* FUNCTION
+	*
+	*	delfile
+	*
+	* PARAMETERS
+	*
+	*	The name				- Type: DATtype
+	*	The owner				- Type: unsigned int
+	*
+	* RETURN VALUE
+	*
+	*	The function does not return a value
+	*
+	* MEANING
+	*
+	*	The function will delete a file.
+	*
+	***************************************************/
 	void delfile(string &, string &);
 
+	/*************************************************
+	* FUNCTION
+	*
+	*	delfile
+	*
+	* PARAMETERS
+	*
+	*	The name				- Type: DATtype
+	*
+	* RETURN VALUE
+	*
+	*	The DirEntry of the file received
+	*	In case the file doesn't exist the function 
+	*	return NULL
+	*
+	* MEANING
+	*
+	*	The function returns the DirEntry of a file
+	*
+	***************************************************/
 	DirEntry * getDir( const char * FileName);
 
+	FileHeader getFileHeader(DirEntry *);
+
+	/*************************************************
+	*
+	*				  Level 3
+	*
+	**************************************************/
+
+	int hi(int c) { return 0; }
+
+
+
+	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
 
 
 	/*************************************************
@@ -289,6 +544,7 @@ public:
 	**************************************************/
 	friend class TestLevel_0;
 	friend class TestLevel_2;
+	friend class FCB;
 
 
 	

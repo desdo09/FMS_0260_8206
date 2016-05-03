@@ -226,6 +226,24 @@ void Disk::seekToSector(uint index)
 	this->currDiskSectorNr = index;												// Update Current Disk Sector Number
 }
 
+void Disk::seekToSector(DATtype FAT, uint index)
+{
+	uint IndexCopy = index;
+	int firstFileSec = this->firstIndex(FAT, false, this->firstIndex(FAT, false));
+	int i;
+	for (i = firstFileSec + 1; i < amountOfSectors && index > 0; i++)
+	{
+		if (FAT[i])
+			IndexCopy--;		
+	}
+
+	if (IndexCopy > 0)
+		throw ProgramExeption("Overflow error", "Disk::seekToSector");
+
+	seekToSector(firstFileSec + i - 1);
+	
+}
+
 void Disk::writeSector(uint index, Sector * sec)
 {
 
@@ -240,6 +258,9 @@ void Disk::writeSector(Sector * sec)
 {
 	if (!this->mounted)
 		throw ProgramExeption("There not mounted disk", "WriteSector");
+
+	if (sec->sectorNr == 99999999)
+		sec->sectorNr = currDiskSectorNr;
 
 	dskfl.write((char *)&sec, sizeof(sec));
 
@@ -574,6 +595,9 @@ void Disk::flush()
 
 	if (vhd.isFormated)
 		dskfl.write((char *)&rootdir, sizeof(RootDir));								// Write a copy of the Root disk into the disk 											// Disk set as mounted
+
+	dskfl.flush();
+
 }
 
 
@@ -586,6 +610,13 @@ void Disk::flush()
 
 void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint offsetSize)
 {
+
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "createfile");
+
+	if (!vhd.isFormated)
+		throw ProgramExeption("This disk is not formatted", "createfile");
+
 	if (this->rootdir.msbSector.fileExist(fileName.c_str()) || this->rootdir.lsbSector.fileExist(fileName.c_str()))
 		throw ProgramExeption("File already exist!", "createfile");
 
@@ -643,6 +674,12 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 
 void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 {
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "extendfile");
+
+	if (!vhd.isFormated)
+		throw ProgramExeption("This disk is not formatted", "extendfile");
+
 	bool msbSector = true;
 	short dirIndex = rootdir.msbSector.findDirByName(fileName.c_str());
 
@@ -662,11 +699,7 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 	if (!dskfl.is_open())
 		throw ProgramExeption("Files problem", "extendfile");
 
-	FileHeader fh;
-
-	seekToSector(dir->fileAddr);
-
-	dskfl.read((char *)&fh, sizeof(Sector));
+	FileHeader fh = getFileHeader(dir);
 
 	allocextend(fh.FAT, sectorSize, Disk::AlgorithmType::first_Fit);
 
@@ -681,6 +714,12 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 
 void Disk::delfile(string & fileName, string & owner)
 {
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "delfile");
+
+	if (!vhd.isFormated)
+		throw ProgramExeption("This disk is not formatted", "delfile");
+
 	bool msbSector = true;
 	short dirIndex = rootdir.msbSector.findDirByName(fileName.c_str());
 
@@ -718,6 +757,11 @@ void Disk::delfile(string & fileName, string & owner)
 DirEntry * Disk::getDir(const char * fileName)
 {
 
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "getDir");
+
+	if (!vhd.isFormated)
+		throw ProgramExeption("This disk is not formatted", "getDir");
 
 	bool msbSector = true;
 	short dirIndex = rootdir.msbSector.findDirByName(fileName);
@@ -734,6 +778,51 @@ DirEntry * Disk::getDir(const char * fileName)
 	return (msbSector) ? &rootdir.msbSector.dirEntry[dirIndex] : &rootdir.lsbSector.dirEntry[dirIndex];
 
 	
+
+	
+}
+
+FileHeader Disk::getFileHeader(DirEntry * dir)
+{
+	FileHeader fh;
+
+	seekToSector(dir->fileAddr);
+
+	dskfl.read((char *)&fh, sizeof(Sector));
+
+	return fh;
+}
+
+/*************************************************
+*
+*				  Level 3
+*
+**************************************************/
+
+FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpening type)
+{
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "openfile");
+
+	if (!vhd.isFormated)
+		throw ProgramExeption("This disk is not formatted", "openfile");
+
+	DirEntry * fileDir = this->getDir(fileName.c_str());
+
+	if (fileDir == NULL)
+		return NULL;
+
+	if (type != enumsFMS::FCBtypeToOpening::output && userName == fileDir->fileOwner)
+		throw ProgramExeption("The user is not allowed to write in this file", "openfile");
+	//Find next sector after File Header
+	uint firstSec = firstIndex(getFileHeader(fileDir).getFAT(), false, firstIndex(getFileHeader(fileDir).getFAT(), false));
+
+	this->readSector(firstSec, &this->buffer);
+
+	return (new FCB(this, *fileDir, getFileHeader(fileDir).getFAT(),
+					&this->buffer,(uint)0,firstSec,(uint) 0, type));
+
+
 
 	
 }

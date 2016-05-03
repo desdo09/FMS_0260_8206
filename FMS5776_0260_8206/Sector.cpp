@@ -24,12 +24,10 @@ Sector::Sector(FileHeader * fh)
 		this->rawData[i] = *((char *)fh + i);
 }
 
-Sector::Sector(const void * x)
+Sector::Sector(const void * data)
 {
-	for (int i = 0; i < 1024 && i<sizeof(x); i++)
-		this->rawData[i] = *((char *)x + i);
-
-	
+	sectorNr = 99999999;
+	memcpy(rawData, data, 1020);
 }
 
 

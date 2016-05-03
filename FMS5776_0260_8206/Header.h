@@ -18,5 +18,31 @@ using  uint = unsigned int;
 
 using  DATtype = bitset<amountOfSectors>;
 
+class DAT;
+
+class Disk;
+
+class SectorDir;
+
+class RootDir;
+
+class FileHeader;
+
+class VolumeHeader;
+
+class Sector;
+
+class DirEntry;
+
+class FCB;
+
+namespace enumsFMS
+{
+	enum FCBtypeToOpening { input = 0, output, inputOutput, Extension };
+	enum FCBseekfrom { beginning, current, eof };
+}
+
+
+
 
 

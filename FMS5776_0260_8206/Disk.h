@@ -17,7 +17,7 @@ private:
 	bool          mounted;
 	fstream       dskfl;
 	uint          currDiskSectorNr;
-	char          buffer[sizeof(Sector)];
+	Sector        buffer;
 
 
 	/*************************************************
@@ -210,6 +210,21 @@ public:
 	*
 	***************************************************/
 	void seekToSector(uint);
+	/*************************************************
+	* FUNCTION
+	*   seekToSector
+	* PARAMETERS
+	*	The FAT file
+	*   The sector index
+	* RETURN VALUE
+	*	This function does not return parameters
+	*
+	* MEANING
+	*	The function will seek the fstream object (dskfl)
+	*	to the sector asked through the FAT 
+	*
+	***************************************************/
+	void seekToSector(DATtype FAT,uint);
 	/*************************************************
 	* FUNCTION
 	*   writeSector
@@ -519,7 +534,7 @@ public:
 
 
 
-	FCB * openfile(string , string , FCB::typeToOpening );
+	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
 
 
 	/*************************************************

@@ -22,5 +22,6 @@ class DirEntry
 public:
 	DirEntry();
 	~DirEntry();
+	friend class Disk;
 };
 

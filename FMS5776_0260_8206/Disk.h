@@ -1,3 +1,4 @@
+#pragma once
 #include"Header.h"
 #include "VolumeHeader.h"
 #include "Dir.h"
@@ -17,9 +18,9 @@ private:
 	uint          currDiskSectorNr;
 	char          buffer[sizeof(Sector)];
 	
-	uint firstFit(uint);
-	uint bestFit(uint);
-	uint worstFit(uint);
+	uint firstFit(uint, uint);
+	uint bestFit(uint, uint);
+	uint worstFit(uint, uint);
 
 public:
 	enum ConstructorCod
@@ -28,7 +29,11 @@ public:
 		Mount = 'm',
 		
 	};
-	enum AlgorithmType { first_Fit, best_Fit, worst_Fit};
+	enum AlgorithmType { first_Fit=1, best_Fit, worst_Fit};
+
+	bool getMounted() { return mounted; }
+	DATtype  getDatDAt() { return dat.Getdat(); }
+
 	/*************************************************
 	* CONSTRUCTOR
 	*    Default constructor
@@ -201,19 +206,27 @@ public:
 	*
 	*
 	***************************************************/
-	int howmuchempty();
+	int howmuchempty(uint);
 
 	/*************************************************
 	* FUNCTION
 	*
+	*	Allocate sectors into the DAT
+	*
 	* PARAMETERS
+	*
+	*	The FAT            - Type: DATtype
+	*	The amount         - Type: unsigned int
+	*	The algorithm type - Type: Disk::AlgorithmType
 	*
 	* RETURN VALUE
 	*
+	*	The function does not return a value
 	*
 	* MEANING
-	*
-	*
+	*	
+	*	The function will allocate the numbers of sectors into the DAT 
+	*	with the algorithm request by the user. 
 	***************************************************/
 	void alloc(DATtype &, uint, AlgorithmType);
 
@@ -247,6 +260,19 @@ public:
 	*
 	***************************************************/
 	void dealloc(DATtype &);
+
+	void flush();
+
+
+	/*************************************************
+	*
+	*				  Level 2
+	*
+	**************************************************/
+
+	void createfile(string & , string & , bool , uint , uint , string & , uint , uint );
+
+	
 
 	friend class TestLevel_0;
 

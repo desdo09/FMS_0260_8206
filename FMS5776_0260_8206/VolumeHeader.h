@@ -1,3 +1,4 @@
+#pragma once
 #include"Header.h"
 
 // Class size
@@ -44,7 +45,7 @@ public:
 	void SetdiskName(string);
 	void SetdiskOwner(string);
 	void SetprodDate(string);
-	void SetformaDate(string);
+	void SetformaDate();
 	void SetisFormated(bool);
 
 	void Set();
@@ -59,7 +60,7 @@ public:
 	//friends
 	 
 	friend class TestLevel_0;
-	//friend class Disk;
+	friend class Disk;
 	
 
 };

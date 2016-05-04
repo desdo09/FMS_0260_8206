@@ -51,9 +51,6 @@
     <ClInclude Include="Header.h">
       <Filter>Program Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestLevel_0.h">
-      <Filter>Header Files\Physical layer</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VolumeHeader.cpp">

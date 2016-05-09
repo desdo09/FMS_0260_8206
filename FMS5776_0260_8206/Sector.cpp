@@ -4,6 +4,7 @@
 
 Sector::Sector()
 {
+	
 }
 
 Sector::Sector(uint index)
@@ -24,12 +25,18 @@ Sector::Sector(FileHeader * fh)
 		this->rawData[i] = *((char *)fh + i);
 }
 
-Sector::Sector(const void * data)
+Sector::Sector(const char * data)
 {
 	sectorNr = 99999999;
 	memcpy(rawData, data, 1020);
 }
 
+Sector::Sector(uint index, char * data)
+{
+	this->sectorNr = index;
+	memcpy(this->rawData, data,1020);
+
+}
 
 Sector::~Sector()
 {
@@ -41,3 +48,4 @@ void Sector::setSectorNr(uint x)
 {
 	this->sectorNr = x;
 }
+

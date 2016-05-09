@@ -63,6 +63,9 @@
     <ClInclude Include="FCB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Students.h">
+      <Filter>Header Files\Test class</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VolumeHeader.cpp">

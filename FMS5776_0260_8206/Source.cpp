@@ -3,33 +3,49 @@
 #include "TestLevel_0.h"
 #include "TestLevel_2.h"
 #include "FCB.h"
+#include "Students.h"
 
 enum menu{	clear = 1,																			 // Others
 			testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails,            // Level 0
 			printDat, formatDisk, allocate, allocateext, deallocate,							 // Level 1
 			createFile, getFile, extendFile, ShowFileFAT, deleteFile,							 // Level 2
-			newFCB
-		 };
+			newFCB, fileDetails,NStudent, IStudent, GStudent, CUStudent,UStudent,DStudent,		 // Level 3
+			PAStudents
+};
 
 void testLevel1(Disk * d, DATtype & FAT, bool ext = false);
 void DATprint(DATtype DAT,char type = 'D');
-
+int Student::used = 0;
 void main() {
+	
 	system("color a");
+
 	char choice[3],ans;
+
+	char ** allData = NULL;
+
 	TestLevel_0 a;
+
 	Disk * disk = &a.d;
+
 	DATtype FAT;
+
 	FAT.set();
-	FCB * fcb;
-	for (int i = 25; i < 50; i++)
-	{
-		FAT[i] = 1;
-	}
+
+	FCB * fcb = NULL;
+
+	Student stud;
+
+	short anstemp;
+
 	do {
 		try
 		{
 		
+#pragma region Cout Options
+
+
+
 		
 			
 			cout << "Select option:" << endl;
@@ -54,6 +70,17 @@ void main() {
 			cout << "\t\t<15> Extend File " << endl;
 			cout << "\t\t<16> Get FAT from a file " << endl;
 			cout << "\t\t<17> Delete File " << endl;
+			cout << "\n\tLevel 3:" << endl;
+			cout << "\t\t<18> Get FCB " << endl;
+			cout << "\t\t<19> Print file details " << endl;
+			cout << "\t\t<20> New Student  " << endl;
+			cout << "\t\t<21> Insert new Student  " << endl;
+			cout << "\t\t<22> Get Student by id " << endl;
+			cout << "\t\t<23> Cancel student update " << endl;
+			cout << "\t\t<24> Update student " << endl;
+			cout << "\t\t<25> Delete Student by id " << endl;
+			cout << "\t\t<26> Print all students " << endl;
+
 
 			cout << "\nYour choice: [    ]\b\b\b\b";
 
@@ -62,6 +89,8 @@ void main() {
 
 
 			cout << "**************************************************" << endl;
+#pragma endregion
+
 			switch (atoi(choice))
 			{
 			case createDisk:
@@ -126,17 +155,69 @@ void main() {
 				DATprint(FAT,'F');
 				break;
 			case newFCB: 
-				fcb = disk->openfile("File", "David", enumsFMS::FCBtypeToOpening::output);
+
+				fcb = disk->openfile("Students", "David", enumsFMS::FCBtypeToOpening::inputOutput);
+
 				if (fcb != NULL)
 					DATprint(fcb->FAT, 'F');
 				else
 					cout << "File doesn't exist" << endl;
 				break;
-
-			case clear: std::system("cls"); break;
-			default:
-				// std::system("cls");
+			case fileDetails:
+				if (fcb != NULL)
+					TestLevel_2::printHeader(&fcb->fileDesc);
+				else
+					cout << "File are not opened" << endl;
 				break;
+			case NStudent:
+				stud.setStudent();
+			case IStudent:
+				if (fcb != NULL) {
+					fcb->write((char *)&stud);
+				}
+				else
+					cout << "File are not opened" << endl;
+				cout << "Inserted!" << endl;
+				break;
+			case GStudent:
+
+				if (fcb != NULL)
+				{
+					cout << "Insert record number:" << endl;
+					cin >> anstemp;
+					fcb->seek(enumsFMS::FCBseekfrom::beginning, anstemp);
+					fcb->read((char *)&stud, true);
+					stud.printStudent();
+				}
+				else
+					cout << "File are not opened" << endl;
+				break;
+			
+			case CUStudent:
+				fcb->updateCancel();
+				cout << "Update canceled" << endl;
+				break;
+			case UStudent:
+				stud.updateStudent();
+				fcb->update((char *)&stud);
+				break;
+			case DStudent:
+				fcb->deleteRec();
+				break;
+			case PAStudents:
+				cout << "Total rec in file --> " << fcb->fileTotalRec() << endl;
+				allData = fcb->getAllFile();
+				for (int i = 0; i < fcb->fileTotalRec(); i++)
+				{
+					if (allData[i] != NULL)
+					{
+						memcpy(&stud, allData[i], sizeof(Student));
+						stud.printStudent();
+					}
+				}
+				break;
+			case clear: std::system("cls"); break;
+			
 			}
 
 

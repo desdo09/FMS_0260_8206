@@ -35,19 +35,41 @@ public:
 				delete [] d;
 		}
 		
+
+
+		/*Gets functions*/
+
+		bool islastRecord();
+
+		unsigned long getKey();
+
+		char ** getAllFile();
+
+		unsigned long fileTotalRec() { return fileDesc.eofRecNr; }
+
+		uint getRecSize() { return fileDesc.actualRecSize; }
+
+		/****/
+
+
 		void closefile();
 
 		void flushfile();
+
 		void read(char *, bool update = false);
+
 		void write(char * data,int recordInFile = -1 );
+
 		void seek(enumsFMS::FCBseekfrom, int = 0);
+
 		void updateCancel();
+
 		void deleteRec();
+
 		void update(char *);
-		unsigned long getKey();
-	
-	
+
 		friend class Disk;
+
 		friend void main();
 };
 

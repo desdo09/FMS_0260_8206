@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace UIFMS.Properties
+namespace FMS_GUI.Properties
 {
 
 

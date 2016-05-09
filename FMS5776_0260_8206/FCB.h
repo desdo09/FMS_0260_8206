@@ -32,7 +32,7 @@ public:
 		FCB (Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned long currRecNr, uint currRecNrInBuff, enumsFMS::FCBtypeToOpening type);
 		~FCB(){ 
 			if(d!=NULL)
-				delete [] d;
+				delete d;
 		}
 		
 

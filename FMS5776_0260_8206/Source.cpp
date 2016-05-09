@@ -9,8 +9,9 @@ enum menu{	clear = 1,																			 // Others
 			testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails,            // Level 0
 			printDat, formatDisk, allocate, allocateext, deallocate,							 // Level 1
 			createFile, getFile, extendFile, ShowFileFAT, deleteFile,							 // Level 2
-			newFCB, fileDetails,NStudent, IStudent, GStudent, CUStudent,UStudent,DStudent									 // Level 3
-		 };
+			newFCB, fileDetails,NStudent, IStudent, GStudent, CUStudent,UStudent,DStudent,		 // Level 3
+			PAStudents
+};
 
 void testLevel1(Disk * d, DATtype & FAT, bool ext = false);
 void DATprint(DATtype DAT,char type = 'D');
@@ -20,6 +21,8 @@ void main() {
 	system("color a");
 
 	char choice[3],ans;
+
+	char ** allData = NULL;
 
 	TestLevel_0 a;
 
@@ -76,6 +79,7 @@ void main() {
 			cout << "\t\t<23> Cancel student update " << endl;
 			cout << "\t\t<24> Update student " << endl;
 			cout << "\t\t<25> Delete Student by id " << endl;
+			cout << "\t\t<26> Print all students " << endl;
 
 
 			cout << "\nYour choice: [    ]\b\b\b\b";
@@ -199,6 +203,18 @@ void main() {
 				break;
 			case DStudent:
 				fcb->deleteRec();
+				break;
+			case PAStudents:
+				cout << "Total rec in file --> " << fcb->fileTotalRec() << endl;
+				allData = fcb->getAllFile();
+				for (int i = 0; i < fcb->fileTotalRec(); i++)
+				{
+					if (allData[i] != NULL)
+					{
+						memcpy(&stud, allData[i], sizeof(Student));
+						stud.printStudent();
+					}
+				}
 				break;
 			case clear: std::system("cls"); break;
 			

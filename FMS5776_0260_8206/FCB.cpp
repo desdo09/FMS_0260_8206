@@ -39,6 +39,7 @@ void FCB::closefile()
 		throw ProgramExeption("Operation are not allowed", "FCB::closefile");
 	this->flushfile();
 	d->unmountdisk();
+	delete d;
 	d = NULL;
 }
 
@@ -204,11 +205,13 @@ void FCB::deleteRec()
 
 	long zero = 0;
 
-	memcpy((this->Buffer.getData() + currRecNrInBuff + fileDesc.keyOffset), &zero, fileDesc.keySize);
+	memcpy((this->Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + fileDesc.keyOffset), &zero, fileDesc.keySize);
 	
 	lock = false;
 	
 	d->writeSector(&this->Buffer);
+
+
 }
 
 void FCB::update(char * update)
@@ -234,6 +237,12 @@ void FCB::update(char * update)
 	this->flushfile();
 }
 
+bool FCB::islastRecord()
+{
+	return (this->currRecNr == fileDesc.eofRecNr);
+	
+}
+
 unsigned long FCB::getKey()
 {
 
@@ -242,6 +251,33 @@ unsigned long FCB::getKey()
 	memcpy(&key, (this->Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + fileDesc.keyOffset), fileDesc.keySize);
 
 	return key;
+}
+
+char ** FCB::getAllFile()
+{
+	if (fileDesc.eofRecNr == 0)
+		return NULL;
+	char ** file;
+	if(fileDesc.eofRecNr>1)
+			file = new char *[fileDesc.eofRecNr];
+	else
+			file = new char *;
+
+
+	this->seek(FCBseekfrom::beginning, 0);
+	for (int i = 0; i < fileDesc.eofRecNr; i++)
+	{
+		if (currRecNr)		//check if the key is not 0
+		{
+			file[i] = new char[fileDesc.actualRecSize];
+			this->read(file[i]);
+		}
+		else
+		{
+			file[i] = NULL;
+		}
+	}
+	return file;
 }
 
 

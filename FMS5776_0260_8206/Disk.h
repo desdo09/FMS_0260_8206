@@ -522,6 +522,28 @@ public:
 	***************************************************/
 	DirEntry * getDir( const char * FileName);
 
+	/*************************************************
+	* FUNCTION
+	*
+	*	getFileHeader
+	*
+	* PARAMETERS
+	*
+	*	A DirEntry
+	*
+	* RETURN VALUE
+	*
+	*	Return the file header
+	*
+	* MEANING
+	*
+	*	The function will seek to the first sector of the file
+	*	and get the file header, then the function will return
+	*	it.
+	*
+	***************************************************/
+
+
 	FileHeader getFileHeader(DirEntry *);
 
 	/*************************************************
@@ -530,12 +552,9 @@ public:
 	*
 	**************************************************/
 
-	int hi(int c) { return 0; }
-
-
-
 	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
 
+	uint updateFile(DirEntry);
 
 	/*************************************************
 	*

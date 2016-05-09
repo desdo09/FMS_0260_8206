@@ -14,7 +14,7 @@ class DirEntry
 	char recFormat[2];			// 
 	uint keyOffset;				//
 	uint keySize;				// 
-	char keyType[2];			// Key Type - (I)nt,(F)loat,(D)ouble,(C)har *
+	char keyType[2];			// Key Type - (I)nt,(F)loat,(D)ouble
 	unsigned short entryStatus;	// 0 - empty 1 - Active 2- inactive
 
 

@@ -18,8 +18,8 @@ private:
 	fstream       dskfl;
 	uint          currDiskSectorNr;
 	Sector        buffer;
-
-
+	string		  lastErrorMessage;
+	string		  lastErrorSource;
 	/*************************************************
 	*
 	*				Private function from
@@ -94,8 +94,16 @@ public:
 	*
 	**************************************************/
 	bool getMounted() { return mounted; }
+	
 	DATtype  getDatDAt() { return dat.Getdat(); }
+	
+	string& GetLastErrorMessage() { return this->lastErrorMessage; } 
 
+	string& GetLastErrorSource() { return this->lastErrorSource; }
+	
+	void SetLastErrorMessage(string lastErrorMessage) { this->lastErrorMessage = lastErrorMessage; }
+	
+	void SetLastErrorSource(string lastErrorSource) { this->lastErrorSource = lastErrorSource; }
 
 	/*************************************************
 	* 
@@ -335,7 +343,7 @@ public:
 	*
 	*
 	***************************************************/
-	uint howmuchempty(uint);
+	uint howmuchempty(uint = 0);
 
 	/*************************************************
 	* FUNCTION
@@ -555,6 +563,20 @@ public:
 	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
 
 	uint updateFile(DirEntry);
+
+	/*************************************************
+	*
+	*				  Functions to Dll
+	*
+	**************************************************/
+
+	VolumeHeader getVolumeHeader() { return vhd; }
+
+	DirEntry * getDirEntry(int index,SectorDir * sector = NULL);
+
+	bool dirExist(int index,SectorDir * = NULL);
+
+	bool IsFormated();
 
 	/*************************************************
 	*

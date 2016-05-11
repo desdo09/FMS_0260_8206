@@ -66,8 +66,11 @@ void Disk::createdisk(string diskName, string owner) {
 	dskfl.open(diskName.c_str(), ios::out | ios::binary);						// Create and open the file with the name receive
 
 
+
 	if (!dskfl.is_open()) {														// In case of error
-		throw ProgramExeption("Error to open the file!", "Disk::createdisk");	// throw an exception
+		string error = "Error to open the file ";
+		error += diskName.c_str();
+		throw ProgramExeption(error.c_str(), "Disk::createdisk");	// throw an exception
 	}
 
 	Sector temp;
@@ -80,7 +83,7 @@ void Disk::createdisk(string diskName, string owner) {
 	}
 	//dskfl.flush();
 
-	vhd.SetdiskName(diskName.substr(0, diskName.length() - extensionLenght));	// Set the disk name into volume header
+	vhd.SetdiskName(diskName.substr(diskName.find_last_of("\\") + 1, diskName.length() - extensionLenght));	// Set the disk name into volume header
 
 	vhd.SetdiskOwner(owner);													// Set the owner name into volume header
 
@@ -449,7 +452,7 @@ void Disk::format(string & owner)
 	this->flush();
 }
 
-uint Disk::howmuchempty(uint index = 0)
+uint Disk::howmuchempty(uint index)
 {
 	if (index == 0)
 		return (int)dat.dat.count();
@@ -881,3 +884,55 @@ uint Disk::updateFile(DirEntry file)
 
 	return file.fileAddr + 1;
 }
+
+/*************************************************
+*
+*				  Functions to Dll
+*
+**************************************************/
+
+DirEntry * Disk::getDirEntry(int index, SectorDir * sector)
+{
+	//throw ProgramExeption(to_string( this->rootdir.msbSector.dirEntry[4].entryStatus));
+
+	if (!this->mounted)
+		throw ProgramExeption("There is not mounted disk", "Disk::getDirEntry");
+
+	if (!vhd.isFormated)
+		throw ProgramExeption("This disk is not formatted", "Disk::getDirEntry");
+
+	if (sector != NULL)
+		if (index < 14)
+			return &sector->dirEntry[index];
+		else
+			throw ProgramExeption("Each folder contains max 14 files","Disk::getDirEntry");
+
+	if (index < 28)
+		if (index < 14)
+			if(this->rootdir.msbSector.dirEntry[index].entryStatus == 1 )
+				return &this->rootdir.msbSector.dirEntry[index];
+			else return NULL;
+		else
+			if (this->rootdir.lsbSector.dirEntry[index - 14].entryStatus == 1)
+				return &this->rootdir.lsbSector.dirEntry[index - 14];
+			else return NULL;
+	else
+		throw ProgramExeption("The root folder contains max 14 files","Disk::getDirEntry");
+}
+
+bool Disk::dirExist(int index, SectorDir * sec)
+{
+	bool check;
+	if (index < 14)
+		check = this->rootdir.msbSector.dirEntry[index].entryStatus == 1;
+	else
+		check =  this->rootdir.lsbSector.dirEntry[index-14].entryStatus == 1;
+
+	return check;
+}
+
+bool Disk::IsFormated()
+{
+	return this->vhd.isFormated;
+}
+

@@ -89,9 +89,6 @@
     <ClCompile Include="Sector.cpp">
       <Filter>Resource Files\Pphysical layer</Filter>
     </ClCompile>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FCB.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>

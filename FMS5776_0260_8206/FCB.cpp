@@ -76,7 +76,7 @@ void FCB::read(char * Data, bool update)
 
 	if (currRecNr)
 	{
-		for (int i = 0; i < fileDesc.actualRecSize; i++)
+		for (uint i = 0; i < fileDesc.actualRecSize; i++)
 		{
 			*(Data + i) = *(Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + i);			
 		}
@@ -265,7 +265,7 @@ char ** FCB::getAllFile()
 
 
 	this->seek(FCBseekfrom::beginning, 0);
-	for (int i = 0; i < fileDesc.eofRecNr; i++)
+	for (uint i = 0; i < fileDesc.eofRecNr; i++)
 	{
 		if (currRecNr)		//check if the key is not 0
 		{

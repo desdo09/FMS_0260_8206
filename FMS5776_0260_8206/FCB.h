@@ -23,7 +23,9 @@ private:
 		uint * currSecNr;						// The sector number
 		enumsFMS::FCBtypeToOpening type;		// File open type
 		bool lock;								// 
-	
+		string lastErrorMessage;
+		string lastErrorSource;
+
 public:
 	
 		
@@ -31,8 +33,8 @@ public:
 		FCB(Disk * d = NULL);
 		FCB (Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned long currRecNr, uint currRecNrInBuff, enumsFMS::FCBtypeToOpening type);
 		~FCB(){ 
-			if(d!=NULL)
-				delete d;
+			/*if(d!=NULL)
+				delete d;*/
 		}
 		
 
@@ -49,8 +51,16 @@ public:
 
 		uint getRecSize() { return fileDesc.actualRecSize; }
 
-		/****/
+		string& GetLastErrorMessage() { return this->lastErrorMessage; }
 
+		string& GetLastErrorSource() { return this->lastErrorSource; }
+
+		
+		/****/
+		
+		void SetLastErrorMessage(string lastErrorMessage) { this->lastErrorMessage = lastErrorMessage; }
+
+		void SetLastErrorSource(string lastErrorSource) { this->lastErrorSource = lastErrorSource; }
 
 		void closefile();
 

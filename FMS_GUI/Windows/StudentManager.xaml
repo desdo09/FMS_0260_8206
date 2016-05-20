@@ -1,0 +1,60 @@
+﻿<Window x:Class="FMS_GUI.Windows.StudentManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FMS_GUI.Windows"
+        mc:Ignorable="d"
+        Title="Student manager" Height="300" Width="300" ResizeMode="CanMinimize">
+    <Window.Resources>
+        <Style TargetType="Label">
+
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Name="newStud" Source="/FMS_GUI;component/Images/newStudent.fw.png" Margin="2px" />
+                <Image Name="updateStud" Source="/FMS_GUI;component/Images/update_Student.fw.png" Margin="2px" Visibility="Collapsed"/>
+                <Label Content="New student" FontSize="26px" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding ElementName=newStud,Path=Visibility,Mode=TwoWay}"/>
+                <Label Content="Update student" FontSize="26px" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding ElementName=updateStud,Path=Visibility,Mode=TwoWay}"/>
+            </Grid>
+            <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,15px,0,0">
+                <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Center">
+
+                    <Label Content="Id"/>
+                    <TextBox Width="40" Margin="5,0" Name="idText"/>
+                    <Label Content="Name"/>
+                    <TextBox Width="170" Margin="5,0" Name="nameText" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,20">
+
+                    <Label Content="year"/>
+                    <TextBox Width="90" Margin="5,0" Name="yearText"/>
+                    <Label Content="average"/>
+                    <TextBox Width="90" Margin="5,0" Name="averageText"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10px,0,0">
+                    <Button Content="Cancel" HorizontalAlignment="Right" Margin="5px,0" Click="Button_Click_1"/>
+                    <Button Content="Submit" HorizontalAlignment="Right" Margin="10px,0" Click="Button_Click"/>
+                </StackPanel>
+            </StackPanel>
+            
+        </Grid>
+    </Grid>
+</Window>
+

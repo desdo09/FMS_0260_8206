@@ -2,7 +2,9 @@
 #include "Disk.h"
 #include <string>       // std::string
 #include <iostream>     // std::cout
-#include <sstream>     
+#include <sstream>  
+#include "Students.h"
+#include "ExternalFile.h"
 
 
 
@@ -169,15 +171,20 @@ extern "C"
 	}
 
 	//Level 2
-	__declspec(dllexport) void  createfile(Disk* THIS, char* fileName, char* fileOwner, char* FinalOrVar,
-		unsigned int recSize, unsigned int fileSize,
-		char* keyType, unsigned int keyOffset, unsigned int keySize)
+
+	//Create student
+	__declspec(dllexport) void  createStudentfile(Disk* THIS, char* fileName, char* fileOwner, int fileSize, int recSize = 0)
 	{
 		try
 		{
-			THIS->createfile((string)fileName, (string)fileOwner, (FinalOrVar = "V") ? true : false,
-				recSize, fileSize,
-				keyType, keyOffset, keySize);
+
+			if (recSize == 0)
+				recSize = sizeof(Student);
+
+			string name = ((string)fileName).substr(0, 6);
+			name += ".stud";
+
+			THIS->createfile(name, (string)fileOwner, false,recSize, fileSize,"I", 0, 4);
 		}
 		catch (ProgramExeption ex)
 		{
@@ -192,7 +199,42 @@ extern "C"
 			throw ex;
 		}
 	}
+	//Import file from the pc
+	__declspec(dllexport) void  importFile(Disk* THIS, char* path, char* fileName, char* fileOwner)
+	{
+		bool created = false;
+		try
+		{
+			string allPath = path;
+			allPath += "\\";
+			allPath += fileName;
+			if(strlen(fileName) > 11)
+				strncpy_s(fileName, 12, &fileName[strlen(fileName) - 11], _TRUNCATE);
+			
+			ExternalFile file(allPath.c_str());
+			file.setStatus(THIS->getStatus());
+			THIS->createfile((string)fileName,(string) fileOwner, false, sizeof(ExternalFileSec), ExternalFile::calculateFileSize(allPath.c_str()), "I", 0, 2);
+			created = true;
+			file.importFile();
+			file.exportToFcb(THIS->openfile((string)fileName, (string)fileOwner, enumsFMS::FCBtypeToOpening::inputOutput));
+		}
+		catch (ProgramExeption ex)
+		{
+			if (created)
+				THIS->delfile(((string)fileName), (string)fileOwner);
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
 
+	
 	__declspec(dllexport) void  delfile(Disk* THIS, char* fileName, char* fileOwner)
 	{
 		try
@@ -279,7 +321,7 @@ extern "C"
 	{
 		try
 		{
-			THIS->read(dest, (readForUpdate) ? true : false);
+			THIS->read(dest, (readForUpdate != 0) ? true : false);
 		}
 		catch (ProgramExeption ex)
 		{
@@ -390,7 +432,33 @@ extern "C"
 			throw ex;
 		}
 	}
+	__declspec(dllexport) void  getfileDesc(FCB* THIS, DirEntry * buffer)
+	{
+		try
+		{
+			if (THIS->getfileDesc() == NULL)
+			{
+				THIS->SetLastErrorMessage("File doesn't exist");
+				THIS->SetLastErrorSource("Dll::getDirEntry");
+				throw;
+			}
 
+			memcpy_s(buffer, sizeof(DirEntry), THIS->getfileDesc(), sizeof(DirEntry));
+
+		}
+		catch (ProgramExeption ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
 
 
 	// extra
@@ -469,15 +537,52 @@ extern "C"
 		}
 	}
 
+	__declspec(dllexport) void  exportFile(Disk* THIS, char * exportDir, char* fileName, char * fileOwner , FCB * fcb = NULL)
+	{
+		bool created = false;
+		try
+		{
+			ExternalFile file(fileName);
+			file.setStatus(THIS->getStatus());
+			if (fcb == NULL)
+				fcb = THIS->openfile((string)fileName, (string)fileOwner, enumsFMS::FCBtypeToOpening::inputOutput);
+			file.importFromFcb(fcb);
+			
+			file.exportFile(exportDir);
+		}
+		catch (ProgramExeption ex)
+		{
+			if (created)
+				THIS->delfile(((string)fileName), (string)fileOwner);
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
+	
+	__declspec(dllexport) double  getStatus(Disk * d)
+	{
+		
+			return *d->getStatus();
+		
+	}
 
-	/*
-	string str;
+	
 	__declspec(dllexport) const char*  getDat(Disk* THIS)
 	{
-		std::stringstream ss;
-		ss << THIS->getDatDAt();
-		str = ss.str();
-		return str.c_str();
+		char * str = new char[1601];
+		for (int i = 0; i < 1600; i++)
+		{
+			str[i] = (THIS->getDatDAt()[i]) ?(char) 49 :(char)48;
+		}
+		str[1600] = '\0';
+		return str;
 	}
-	*/
+	
 }

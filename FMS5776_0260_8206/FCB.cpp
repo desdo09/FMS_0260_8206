@@ -12,6 +12,9 @@ FCB::FCB(Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned lon
 	this->fileDesc = fileDesc;
 	this->FAT = FAT;
 	this->currSecNr = &d->currDiskSectorNr;
+
+	maxRecPerSec = sizeof(Sector) / fileDesc.actualRecSize;
+
 	if (Buffer != NULL)
 		this->Buffer = *Buffer;
 	else
@@ -23,6 +26,8 @@ FCB::FCB(Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned lon
 	this->currRecNrInBuff = currRecNrInBuff;
 	this->type = type;
 	lock = false;
+
+
 }
 
 FCB::FCB(Disk * d)
@@ -71,14 +76,16 @@ void FCB::read(char * Data, bool update)
 		throw ProgramExeption("The user have no permission to read", "FCB::read");
 
 	//check if the sector pointer was changed 
-	if(this->currSecNrInBuff != *this->currSecNr)
+	if (this->currSecNrInBuff != *this->currSecNr)
 		this->seek(FCBseekfrom::current, 0);
+	else
+		this->currRecNr = getKey();
 
 	if (currRecNr)
 	{
 		for (uint i = 0; i < fileDesc.actualRecSize; i++)
 		{
-			*(Data + i) = *(Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + i);			
+			*(Data + i) = *(Buffer.getData() + (currRecNrInBuff*fileDesc.actualRecSize) % maxRecPerSec + i);
 		}
 	}
 	else
@@ -88,9 +95,7 @@ void FCB::read(char * Data, bool update)
 
 	if (!lock) // in case is unlocked then seek to the next record
 	{
-		currRecNrInBuff++; 
-
-		if (currRecNrInBuff / fileDesc.fileSize > 0) // in case that was the last record
+		if (currRecNrInBuff % maxRecPerSec == 0)           // in case that was the last record
 			this->seek(enumsFMS::FCBseekfrom::current, 1); // seek to the next sector 
 
 		this->currRecNr = getKey();
@@ -122,7 +127,7 @@ void FCB::write(char * data, int recordInFile)
 
 	char * alldata = this->Buffer.getData();
 
-	memcpy(alldata + currRecNrInBuff*fileDesc.actualRecSize, data, fileDesc.actualRecSize);
+	memcpy(alldata + (currRecNrInBuff*fileDesc.actualRecSize)% maxRecPerSec, data, fileDesc.actualRecSize);
 
 	
 	d->writeSector(&this->Buffer);
@@ -157,11 +162,7 @@ void FCB::seek(enumsFMS::FCBseekfrom from, int toRecord)
 	if (from == enumsFMS::eof)
 		toRecord = fileDesc.eofRecNr;
 
-	int JumpToSector =													 // Amount sector to jump equal 
-						( toRecord)										 // Amount records to jump	
-							/											 // Divided by
-						((sizeof(Sector) - 4) / fileDesc.actualRecSize); // Record per sector
-	
+	int JumpToSector = toRecord / maxRecPerSec;
 
 
 
@@ -172,8 +173,8 @@ void FCB::seek(enumsFMS::FCBseekfrom from, int toRecord)
 	this->currSecNrInBuff = *this->currSecNr;
 
 	this->currRecNrInBuff = toRecord;
-	
-	this->currRecNr = getKey();
+	if(fileDesc.eofRecNr>0)
+		this->currRecNr = getKey();
 
 
 
@@ -248,7 +249,7 @@ unsigned long FCB::getKey()
 
 	unsigned long key = 0;
 
-	memcpy(&key, (this->Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + fileDesc.keyOffset), fileDesc.keySize);
+	memcpy(&key, (this->Buffer.getData() + (currRecNrInBuff*fileDesc.actualRecSize)% maxRecPerSec + fileDesc.keyOffset), fileDesc.keySize);
 
 	return key;
 }

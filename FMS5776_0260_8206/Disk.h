@@ -20,6 +20,7 @@ private:
 	Sector        buffer;
 	string		  lastErrorMessage;
 	string		  lastErrorSource;
+	double		  status = 0;			//For dll
 	/*************************************************
 	*
 	*				Private function from
@@ -463,7 +464,8 @@ public:
 	*	allocate the file into the disk.
 	*
 	***************************************************/
-	void createfile(string & , string & , bool , uint , uint , string, uint , uint );
+	void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint offsetSize);
+
 	/*************************************************
 	* FUNCTION
 	*
@@ -577,6 +579,8 @@ public:
 	bool dirExist(int index,SectorDir * = NULL);
 
 	bool IsFormated();
+
+	double * getStatus() { return &this->status; }
 
 	/*************************************************
 	*

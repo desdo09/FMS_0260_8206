@@ -166,7 +166,7 @@ void Disk::mountdisk(string  fileName)
 	dskfl.seekp(0, ios::beg);													// Return the dskfl to the begin of the file 	
 
 	if (!dskfl.good())
-		throw "File cannot be opened";
+		throw ProgramExeption("File cannot be opened","Disk::mountdisk");
 
 	this->dskfl.read((char *)&vhd, sizeof(Sector));								// Copy the first sector into volume header object
 
@@ -222,14 +222,14 @@ void Disk::seekToSector(DATtype FAT, uint index)
 	  				
 	int i;
 	//Get the file first sector
-	for (i = this->firstIndex(FAT, false) / 2; i < amountOfSectors ; i++)
+	for (i = this->firstIndex(FAT, false) / 2; i < amountOfSectors && index > 1; i++)
 	{
+		
 
 		if (FAT[i] && index > 1)							// if is last than 2 then stop 
 			index -=2;										// 2 sectors	
 
-		if (index <= 1)
-			break;
+	
 	}
 
 	if (index > 1)
@@ -741,6 +741,7 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 
 void Disk::delfile(string & fileName, string & owner)
 {
+	
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "Disk::delfile");
 
@@ -756,7 +757,7 @@ void Disk::delfile(string & fileName, string & owner)
 		dirIndex = rootdir.lsbSector.findDirByName(fileName.c_str());
 	}
 	if (dirIndex == -1)
-		throw ProgramExeption("File not exist!", "Disk::extendfile");
+		throw ProgramExeption("File not exist!", "Disk::delfile");
 
 	DirEntry * dir = (msbSector) ? &rootdir.msbSector.dirEntry[dirIndex] : &rootdir.lsbSector.dirEntry[dirIndex];
 
@@ -851,7 +852,7 @@ FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpenin
 	memcpy(key, (buffer.rawData + fileDir->keyOffset), fileDir->keySize);
 
 	return (new FCB(this, *fileDir, getFileHeader(fileDir).getFAT(),
-					NULL, strtoul(key,NULL,10), 0, type));
+					NULL,0, 0, type));
 	
 
 

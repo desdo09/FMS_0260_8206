@@ -22,7 +22,8 @@ private:
 		uint currSecNrInBuff;					// Where is the record into the buffer
 		uint * currSecNr;						// The sector number
 		enumsFMS::FCBtypeToOpening type;		// File open type
-		bool lock;								// 
+		bool lock;								// Check if update is required
+		int maxRecPerSec;						// Amount of register(s) in a Sector 
 		string lastErrorMessage;
 		string lastErrorSource;
 
@@ -33,8 +34,8 @@ public:
 		FCB(Disk * d = NULL);
 		FCB (Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned long currRecNr, uint currRecNrInBuff, enumsFMS::FCBtypeToOpening type);
 		~FCB(){ 
-			/*if(d!=NULL)
-				delete d;*/
+			closefile();
+			
 		}
 		
 
@@ -54,6 +55,8 @@ public:
 		string& GetLastErrorMessage() { return this->lastErrorMessage; }
 
 		string& GetLastErrorSource() { return this->lastErrorSource; }
+
+		DirEntry * getfileDesc() { return &fileDesc;}
 
 		
 		/****/
@@ -80,6 +83,6 @@ public:
 
 		friend class Disk;
 
-		friend void main();
+		friend class ExternalFile;
 };
 

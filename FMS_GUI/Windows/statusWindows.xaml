@@ -1,0 +1,14 @@
+﻿<Window x:Class="FMS_GUI.Windows.StatusWindows"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FMS_GUI.Windows"
+        mc:Ignorable="d"
+        Title="statusWindows" Height="100" Width="600"
+        ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical">
+        <Label x:Name="titleLabel" VerticalAlignment="Center" HorizontalAlignment="Center" Width="500" FontSize="16px" Content="Title" HorizontalContentAlignment="Center"/>
+        <ProgressBar Name="progress" Value="0" VerticalAlignment="Center" HorizontalAlignment="Center" Width="500" HorizontalContentAlignment="Center" Height="25px"/>
+    </StackPanel>
+</Window>

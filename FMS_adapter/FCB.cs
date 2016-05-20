@@ -6,8 +6,12 @@ using System.Text;
 
 namespace FMS_adapter
 {
+    public enum FCBtypeToOpening { input = 0, output, inputOutput, Extension };
+    public enum FCBseekfrom { beginning = 0, current, eof };
     public class FCB
     {
+
+
         private IntPtr myFCBpointer;
 
         public FCB(IntPtr myFCBpointer)
@@ -83,17 +87,16 @@ namespace FMS_adapter
                 string message = Marshal.PtrToStringAnsi(cString);
                 throw new Exception(message);
             }
-            catch
-            {
-                throw;
-            }
+            catch(Exception)
+            { throw; }
+            
         }
 
-        public void seekRec(uint from, int pos)
+        public void seekRec(FCBseekfrom from, int pos)
         {
             try
             {
-                cppToCsharpAdapter.seekRec(this.myFCBpointer, from, pos);
+                cppToCsharpAdapter.seekRec(this.myFCBpointer, (uint)from, pos);
             }
             catch (SEHException)
             {
@@ -161,6 +164,35 @@ namespace FMS_adapter
             catch
             {
                 throw;
+            }
+        }
+
+        public DirEntry getfileDesc()
+        {
+            try
+            {
+
+                DirEntry dirTemp;
+                int structSize = Marshal.SizeOf(typeof(DirEntry)); //Marshal.SizeOf(typeof(Student)); 
+                IntPtr buffer = Marshal.AllocHGlobal(structSize);
+
+                dirTemp = new DirEntry();
+                Marshal.StructureToPtr(dirTemp, buffer, true);
+                cppToCsharpAdapter.getfileDesc(this.myFCBpointer, buffer);
+                Marshal.PtrToStructure(buffer, dirTemp);
+                Marshal.FreeHGlobal(buffer);
+                return dirTemp;
+
+
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myFCBpointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+
             }
         }
     }

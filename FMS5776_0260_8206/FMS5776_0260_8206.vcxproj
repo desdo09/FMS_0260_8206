@@ -119,6 +119,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DAT.h" />
+    <ClInclude Include="ExternalFile.h" />
     <ClInclude Include="FCB.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="Dir.h" />
@@ -137,9 +138,11 @@
     <ClCompile Include="Dir.cpp" />
     <ClCompile Include="DirEntry.cpp" />
     <ClCompile Include="Disk.cpp" />
+    <ClCompile Include="ExternalFile.cpp" />
     <ClCompile Include="FCB.cpp" />
     <ClCompile Include="FileHeader.cpp" />
     <ClCompile Include="Sector.cpp" />
+    <ClCompile Include="Source2.cpp" />
     <ClCompile Include="VolumeHeader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

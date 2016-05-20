@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FMS_adapter
 {
-    class ProgramException : Exception
+    public class ProgramException : Exception
     {
         public ProgramException()
         {

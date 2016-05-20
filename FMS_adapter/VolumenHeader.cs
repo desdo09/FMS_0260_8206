@@ -22,7 +22,7 @@ namespace FMS_adapter
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
         string prodDate;
-        public string ProdDate { get { return prodDate; } }
+        public string ProdDate { get { return prodDate.Substring(3, 2) + "/" + prodDate.Substring(0, 2) + "/" + prodDate.Substring(6); ; } }
 
         uint clusQty;
         public uint ClusQty { get { return clusQty; } }
@@ -47,7 +47,7 @@ namespace FMS_adapter
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
         string formatDate;
-        public string FormatDate { get { return formatDate; } }
+        public string FormatDate { get { return formatDate.Substring(3, 2) + "/" + formatDate.Substring(0, 2) + "/" + formatDate.Substring(6); } }
 
         [MarshalAs(UnmanagedType.I1)]
         bool isFormated;

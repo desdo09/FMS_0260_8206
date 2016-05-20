@@ -66,6 +66,9 @@
     <ClInclude Include="Students.h">
       <Filter>Header Files\Test class</Filter>
     </ClInclude>
+    <ClInclude Include="ExternalFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VolumeHeader.cpp">
@@ -91,6 +94,12 @@
     </ClCompile>
     <ClCompile Include="FCB.cpp">
       <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExternalFile.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source2.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

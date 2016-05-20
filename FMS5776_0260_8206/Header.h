@@ -39,7 +39,7 @@ class FCB;
 namespace enumsFMS
 {
 	enum FCBtypeToOpening { input = 0, output, inputOutput, Extension };
-	enum FCBseekfrom { beginning, current, eof };
+	enum FCBseekfrom { beginning = 0, current, eof };
 }
 
 

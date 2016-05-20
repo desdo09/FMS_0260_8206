@@ -1,0 +1,93 @@
+﻿<Window x:Class="FMS_GUI.Windows.FileOpen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FMS_GUI.Windows"
+        mc:Ignorable="d"
+        Title="FileOpen" Height="500" Width="550" ResizeMode="CanMinimize">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+
+            <Setter Property="Margin" Value="5px"/>
+        </Style>
+        <Style TargetType="Label">
+          
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="56*"/>
+                <RowDefinition Height="167*"/>
+                <RowDefinition Height="46*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Source="/FMS_GUI;component/Images/open_file.fw.png" Margin="2px"/>
+                <Label Content="Open file" FontSize="26px" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Grid>
+            <DataGrid Grid.Row="1" Name="recList" IsReadOnly="True" AutoGenerateColumns="False" Background="{x:Null}" GridLinesVisibility="None" Margin="5px,0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Student id" Binding="{Binding Id}" Width="*"/>
+                    <DataGridTextColumn Header="Student name" Binding="{Binding Name}" Width="*" />
+                    <DataGridTextColumn Header="Student year" Binding="{Binding Year}" Width="*"/>
+                    <DataGridTextColumn Header="Student average" Binding="{Binding Averange}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Grid Grid.Row="2" Margin="5px,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                
+                
+                <Button Grid.Column="0" Name="newStudentButton" Click="newStudentButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Source="/FMS_GUI;component/Images/newStudent.fw.png"/>
+                        <Label Content="New student" Margin="10px,0,0,0" FontSize="10.667" Grid.Column="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                    </Grid>
+                    
+                </Button>
+                
+                <Button Grid.Column="1" Name="updateStudentButton" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Source="/FMS_GUI;component/Images/update_Student.fw.png"/>
+                        <Label Content="Update student" Margin="10px,0,0,0" FontSize="10.667" Grid.Column="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                    </Grid>
+
+                </Button>
+
+                <Button Grid.Column="2" Name="deleteStudentButton">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Source="/FMS_GUI;component/Images/delete_Student.fw.png"/>
+                        <Label Content="Delete student" Margin="10px,0,0,0" FontSize="10.667" Grid.Column="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                    </Grid>
+
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

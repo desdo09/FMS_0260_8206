@@ -8,7 +8,7 @@ class SectorDir
 private:
 	int sectorNr;
 	DirEntry dirEntry[14];
-	char unUse[12];
+	char unUsed[12];
 
 public:
 	SectorDir();
@@ -16,7 +16,7 @@ public:
 
 	short findNextIndex();
 	bool  fileExist(const char *);
-	short findDirByName(const char *);
+	short findDirByName(const char fileName[12]);
 
 	friend class Disk;
 	friend class RootDir;

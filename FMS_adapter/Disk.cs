@@ -14,6 +14,8 @@ namespace FMS_adapter
         //the disk pointer
         IntPtr myDiskPointer;
 
+
+
         public Disk()
         {
             try
@@ -61,10 +63,7 @@ namespace FMS_adapter
                 throw new ProgramException(message, source);
 
             }
-            catch
-            {
-                throw;
-            }
+
         }
         public List<DirEntry> getDirEntryInRootDir()
         {
@@ -127,12 +126,8 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
-        }
 
+        }
 
         public void Mountdisk(string diskName)
         {
@@ -169,10 +164,7 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
 
@@ -190,10 +182,7 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
 
@@ -216,10 +205,7 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
 
@@ -237,24 +223,28 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
 
         //Level 2
-
-        public void Createfile(string fileName, string fileOwner, string FinalOrVar,
-                                uint recSize, uint fileSize,
-                                string keyType, uint keyOffset, uint keySize = 4)
+        /// <summary>
+        /// The function create a new student file 
+        /// </summary>
+        /// <param name="fileSize">The file size (sectors) </param>
+        /// <param name="fileName">The file name</param>
+        /// <param name="recSize">The size of each record</param>
+        /// <param name="fileOwner">The file owner</param>
+        public void createStudentfile(int fileSize, string fileName, int recSize = 0, string fileOwner = null)
         {
             try
             {
-                cppToCsharpAdapter.createfile(this.myDiskPointer, fileName, fileOwner, FinalOrVar,
-                              recSize, fileSize,
-                                keyType, keyOffset, keySize);
+                if (fileSize < 1)
+                    throw new Exception("File size most be bigger than or equal than 1 byte");
+                if (fileOwner == null)
+                    fileOwner = this.owner;
+
+                cppToCsharpAdapter.createStudentfile(this.myDiskPointer, fileName, fileOwner, fileSize, recSize);
             }
             catch (SEHException)
             {
@@ -264,17 +254,40 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
-
-        public void Delfile(string fileName, string fileOwner)
+        public void importfile(string directory, string fileOwner = null)
         {
             try
             {
+                if (fileOwner == null)
+                    fileOwner = this.owner;
+
+
+                string path = directory.Substring(0, directory.LastIndexOf("\\"));
+                string name = directory.Substring(directory.LastIndexOf("\\") + 1);
+
+
+                cppToCsharpAdapter.importFile(this.myDiskPointer, path, name, this.owner);
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myDiskPointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myDiskPointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+        }
+
+        public void Delfile(string fileName, string fileOwner = null)
+        {
+            try
+            {
+                if (fileOwner == null)
+                    fileOwner = this.owner;
+
                 cppToCsharpAdapter.delfile(this.myDiskPointer, fileName, fileOwner);
             }
             catch (SEHException)
@@ -285,10 +298,7 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
 
@@ -306,20 +316,20 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
-            {
-                throw;
-            }
+
         }
 
 
         // Level 3
 
-        public FCB Openfile(string fileName, string fileOwner, string openMode)
+        public FCB Openfile(string fileName, FCBtypeToOpening openMode = FCBtypeToOpening.inputOutput, string fileOwner = null)
         {
             try
             {
-                IntPtr p = cppToCsharpAdapter.openfile(this.myDiskPointer, fileName, fileOwner, openMode);
+                if (fileOwner == null)
+                    fileOwner = this.owner;
+
+                IntPtr p = cppToCsharpAdapter.openfile(this.myDiskPointer, fileName, fileOwner, (int)openMode);
                 return new FCB(p);
             }
             catch (SEHException)
@@ -330,10 +340,52 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
             }
-            catch
+
+        }
+
+        public void exportFile(string exportDir, string fileName, string fileOwner = null, FCB fcb = null)
+        {
+            try
             {
-                throw;
+                if (fileOwner == null)
+                    fileOwner = this.owner;
+
+                cppToCsharpAdapter.exportFile(this.myDiskPointer, exportDir, fileName, fileOwner, fcb);
             }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myDiskPointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myDiskPointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+        }
+
+        //extra
+        public string getDAT()
+        {
+            try
+            {
+                IntPtr DAT = cppToCsharpAdapter.getDat(this.myDiskPointer);
+                return Marshal.PtrToStringAnsi(DAT).ToString();
+
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myDiskPointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myDiskPointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+
+
+
+        }
+        public double getStatus()
+        {
+            return cppToCsharpAdapter.getStatus(this.myDiskPointer);
         }
     }
 }

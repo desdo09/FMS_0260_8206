@@ -1,0 +1,61 @@
+﻿<Window x:Class="FMS_GUI.Windows.PrintDat"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FMS_GUI.Windows"
+        mc:Ignorable="d"
+        Title="PrintDat" Height="600px" Width="850px" ResizeMode="NoResize">
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="16px"/>
+            <Setter Property="Width" Value="220px"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Name="diskGrid" Orientation="Vertical" Margin="15px,20px,15px,0" Visibility="Collapsed" >
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Content="Disk name" />
+                    <Label Name="diskNameLabel"/>
+                    <Label Content="Disk owner" />
+                    <Label Name="diskOwnerLabel"/>
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Content="Disk created on:" />
+                    <Label Name="diskcreatedLabel"/>
+                    <Label Content="Disk Formated on:" />
+                    <Label Name="diskFormatedLabel"/>
+                    
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Name="fileGrid" Orientation="Vertical" Margin="15px,20px,15px,0" Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Content="File name" />
+                    <Label Name="fileNameLabel"/>
+                    <Label Content="File owner" />
+                    <Label Name="fileOwnerLabel"/>
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  >
+                    <Label Content="file created on:" />
+                    <Label Name="filecreatedLabel"/>
+                    <Label Content="File size:" />
+                    <Label Name="fileSizeLabel"/>
+
+                </StackPanel>
+            </StackPanel>
+                    
+            <Canvas Name="DatMap" Height="400px" Width="800" Grid.Row="1" Background="#FFC7C7C7" HorizontalAlignment="Center">
+            </Canvas>
+
+
+        </Grid>
+    </Grid>
+</Window>

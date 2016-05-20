@@ -1,0 +1,2 @@
+cd /d "C:\Users\User\Documents\Jct\Shiurei Bait\Files Administration Project\FMS5776_0260_8206\FMS_DLL" &msbuild "FMS_DLL.vcxproj" /t:sdvViewer /p:configuration="Debug" /p:platform=Win32
+exit %errorlevel% 

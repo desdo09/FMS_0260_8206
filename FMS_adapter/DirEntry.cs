@@ -4,6 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace FMS_adapter
 {
@@ -24,10 +27,10 @@ namespace FMS_adapter
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
         string _crDate;
-        public string crDate { get { return _crDate; } }
+        public string crDate { get { return _crDate.Substring(3, 2) + "/" + _crDate.Substring(0, 2) + "/" + _crDate.Substring(6); } }
 
         int _fileSize;
-        public string fileSize { get { return _fileSize + " bytes"; } }
+        public string fileSize { get { return _fileSize + " Kb"; } }
 
         int _eofRecNr;
         public int eofRecNr { get { return _eofRecNr; } }
@@ -55,5 +58,51 @@ namespace FMS_adapter
         int _entryStatus;
         public int entryStatus { get { return _entryStatus; } }
 
+        public BitmapSource fileImage
+        {
+
+            get
+            {
+
+                try
+                {
+                    if (filename.Substring(filename.LastIndexOf('.')) == ".stud")
+                    {
+                        BitmapSource temp = new BitmapImage(new Uri("..\\Images\\stud.png", UriKind.Relative));
+                       
+                        return temp;
+                    }
+
+                    string fileAndParam = RegisteredFileType.allFileTypeAndIcon[filename.Substring(filename.LastIndexOf('.'))].ToString();
+
+                    if (String.IsNullOrEmpty(fileAndParam))
+                        return null;
+
+                    Icon icon = null;
+
+                    bool isLarge = false;
+
+
+
+                    icon = RegisteredFileType.ExtractIconFromFile(fileAndParam, isLarge); //RegisteredFileType.ExtractIconFromFile(fileAndParam);
+
+                    //The icon cannot be zero.
+                    if (icon != null)
+                    {
+                        //Draw the icon to the picture box.
+                        return icon.ToBitmap().ToBitmapSource();
+                    }
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+
+
+            }
+
+        }
     }
 }

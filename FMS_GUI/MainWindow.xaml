@@ -6,158 +6,192 @@
         xmlns:local="clr-namespace:FMS_GUI"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800">
-    <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="0.1*"/>
-                <RowDefinition Height="6*"/>
-                <RowDefinition Height="0.25*"/>
-            </Grid.RowDefinitions>
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{x:Null}" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="Background" Value="{x:Null}" />
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
 
-            <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
+    <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+
+        <Grid >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1.05*"/>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="0.4*"/>
+            </Grid.RowDefinitions>
+            <!--Menu bar-->
+            <Grid Grid.Row="0"  Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" >
+                <Grid Margin="0,0,0,10px">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="0.25*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.Resources>
+                        <BitmapImage x:Key="newDiskImage"    UriSource="Images/new_disk.fw.png" />
+                        <BitmapImage x:Key="loadDiskImage"   UriSource="Images/load.fw.png" />
+                        <BitmapImage x:Key="unloadDiskImage" UriSource="Images/unmount.fw.png" />
+                        <BitmapImage x:Key="formatDiskImage" UriSource="Images/format.fw.png" />
+                        <BitmapImage x:Key="diskInfoImage"   UriSource="Images/info_disk.fw.png" />
+                        <BitmapImage x:Key="newFileImage"    UriSource="Images/new_file.fw.png" />
+                        <BitmapImage x:Key="openFileImage"   UriSource="Images/open_file.fw.png" />
+                        <BitmapImage x:Key="saveFileImage"   UriSource="Images/save_file.fw.png" />
+                        <BitmapImage x:Key="deleteFileImage" UriSource="Images/delete_file.fw.png" />
+                    </Grid.Resources>
+
+                    <Button Grid.Column="0" Name="newDiskButton" Click="newDiskButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource newDiskImage}" Margin="3px"/>
+                            <Label Content="New disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="1" Name="mountButton" Click="mountButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource loadDiskImage}" Margin="3px"/>
+                            <Label Content="Mount disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="2" Name="formatButton" Click="formatButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource formatDiskImage}" Margin="3px"/>
+                            <Label Content="Format disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="3" Name="diskInfoButton" Click="diskInfoButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource diskInfoImage}" Margin="3px"/>
+                            <Label Content="Disk info" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="4" Name="unmountButton" Click="unmountButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource unloadDiskImage}" Margin="3px"/>
+                            <Label Content="Unmount disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <StackPanel Orientation="Horizontal" Grid.Column="5" HorizontalAlignment="Center" Margin="6,0">
+                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    </StackPanel>
+                    <Button Grid.Column="6" Name="newButton" Click="newButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource newFileImage}" Margin="3px"/>
+                            <Label Content="New file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="7" Name="openButton" Click="openButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource openFileImage}" Margin="3px"/>
+                            <Label Content="Open file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="8" Name="saveButton" Click="saveButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource saveFileImage}" Margin="3px"/>
+                            <Label Content="Save file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="9" Name="deleteButton" Click="deleteButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource deleteFileImage}" Margin="3px"/>
+                            <Label Content="Delete file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                </Grid>
+            </Grid>
+            <!--Datagrid-->
+            <Grid Grid.Row="1" Margin="0,2,0,28" Grid.RowSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="0.25*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
+                <ListView Grid.Column="0" Background="{x:Null}">
 
-                <Grid.Resources>
-                    <BitmapImage x:Key="newDiskImage"    UriSource="Images/new_disk.fw.png" />
-                    <BitmapImage x:Key="loadDiskImage"   UriSource="Images/load.fw.png" />
-                    <BitmapImage x:Key="unloadDiskImage"   UriSource="Images/unmount.fw.png" />
-                    <BitmapImage x:Key="formatDiskImage" UriSource="Images/format.fw.png" />
-                    <BitmapImage x:Key="newFileImage"    UriSource="Images/new_file.fw.png" />
-                    <BitmapImage x:Key="openFileImage"   UriSource="Images/open_file.fw.png" />
-                    <BitmapImage x:Key="saveFileImage"   UriSource="Images/save_file.fw.png" />
-                    <BitmapImage x:Key="deleteFileImage" UriSource="Images/delete_file.fw.png" />
-                </Grid.Resources>
-
-                <Button Grid.Column="0" Name="newDiskButton" Click="newDiskButton_Click">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource newDiskImage}" Margin="3px"/>
-                        <Label Content="New disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <Button Grid.Column="1" Name="mountButton" Click="mountButton_Click">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource loadDiskImage}" Margin="3px"/>
-                        <Label Content="Mount disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <Button Grid.Column="2" Name="formatButton" Click="formatButton_Click">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource formatDiskImage}" Margin="3px"/>
-                        <Label Content="Format disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <Button Grid.Column="3" Name="unmountButton" Click="unmountButton_Click">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource unloadDiskImage}" Margin="3px"/>
-                        <Label Content="Unmount disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <StackPanel Orientation="Horizontal" Grid.Column="4" HorizontalAlignment="Center" Margin="6,0">
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                </StackPanel>
-                <Button Grid.Column="5" Name="newButton">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource newFileImage}" Margin="3px"/>
-                        <Label Content="New file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <Button Grid.Column="6" Name="openButton">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource openFileImage}" Margin="3px"/>
-                        <Label Content="Open file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <Button Grid.Column="7" Name="saveButton">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource saveFileImage}" Margin="3px"/>
-                        <Label Content="Save file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
-                <Button Grid.Column="8" Name="deleteButton">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="0.5*"/>
-                        </Grid.RowDefinitions>
-                        <Image Source="{StaticResource deleteFileImage}" Margin="3px"/>
-                        <Label Content="Delete file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
-                    </Grid>
-                </Button>
+                </ListView>
+                    <GridSplitter x:Name="gridSplitter" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}" Width="3"/>
+                <Canvas Grid.Column="1" >
+                </Canvas>
+                <DataGrid Grid.Column="2" Name="fileList" IsReadOnly="True" AutoGenerateColumns="False" Background="{x:Null}" GridLinesVisibility="None">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Image" Width="auto" IsReadOnly="True" >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding fileImage}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="File name" Binding="{Binding filename}" Width="*" />
+                        <DataGridTextColumn Header="File owner" Binding="{Binding fileOwner}" Width="*"/>
+                        <DataGridTextColumn Header="File address" Binding="{Binding fileAddr}" Width="*"/>
+                        <DataGridTextColumn Header="File size" Binding="{Binding fileSize}" Width="*"/>
+                        <DataGridTextColumn Header="File create data" Binding="{Binding crDate}"  Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
-            <Canvas Grid.Row="1" Margin="0,-1px,0,0" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
+            <!--Data-->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="0.06*"/>
-                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
-                <ListView Grid.Column="0">
-
-                </ListView>
-                <Canvas Grid.Column="1" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" OpacityMask="#FF3A3535"/>
-                <ListView Grid.Column="2" Name="fileList">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="File name" Width="auto" DisplayMemberBinding="{Binding filename}" />
-                            <GridViewColumn Header="File owner" Width="auto" DisplayMemberBinding="{Binding fileOwner}" />
-                            <GridViewColumn Header="File Address" Width="auto" DisplayMemberBinding="{Binding fileAddr}" />
-                            <GridViewColumn Header="File Size" Width="auto" DisplayMemberBinding="{Binding fileSize}" />
-                            <GridViewColumn Header="Create date" Width="auto" DisplayMemberBinding="{Binding crDate}" />
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </Grid>
-
-            <Grid Grid.Row="3" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="685*"/>
-                    <ColumnDefinition Width="107*"/>
-                </Grid.ColumnDefinitions>
-                    
-                
+                <Label x:Name="totalItemsLabel" Grid.Column="0"  Content="0 items" FontSize="10px" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
+                <ProgressBar Name="DiskUsedBar" Grid.Column="1" Maximum="1600"  BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" Margin="5,4,5,5" Foreground="#FF6FB0F5" Background="{x:Null}" />
+                <Label x:Name="diskUsedLabel" Grid.Column="1" Background="{x:Null}" />
             </Grid>
         </Grid>
     </Grid>

@@ -8,12 +8,6 @@ using System.Threading.Tasks;
 namespace FMS_adapter
 {
 
-
-
-
-
-
-
     class cppToCsharpAdapter
     {
         const string dllPath = "FMS_DLL.dll";
@@ -74,9 +68,10 @@ namespace FMS_adapter
 
         //Level 2
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void createfile(IntPtr THIS, string fileName, string fileOwner, string FinalOrVar,
-                                uint recSize, uint fileSize,
-                                string keyType, uint keyOffset, uint keySize = 4);
+        public static extern void createStudentfile(IntPtr THIS, string fileName, string fileOwner, int fileSize, int recSize = 0);
+
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void importFile(IntPtr THIS, string path, string fileName, string fileOwner);
 
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void delfile(IntPtr THIS, string fileName, string fileOwner);
@@ -87,7 +82,7 @@ namespace FMS_adapter
 
         // Level 3
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr openfile(IntPtr THIS, string fileName, string fileOwner, string openMode);
+        public static extern IntPtr openfile(IntPtr THIS, string fileName, string fileOwner, int openMode);
 
 
         // FCB
@@ -113,14 +108,16 @@ namespace FMS_adapter
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void updateRec(IntPtr THIS, IntPtr source);
 
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void getfileDesc(IntPtr THIS, IntPtr Dir);
+
         // extra
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.AnsiBStr)]
-        public static extern string getDat(IntPtr THIS);
+        public static extern IntPtr getDat(IntPtr THIS);
 
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void getVolumeHeader(IntPtr THIS, IntPtr buffer);
-
+        //THIS->getfileDesc()
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.AnsiBStr)]
         public static extern string getDirEntry(IntPtr THIS);
@@ -133,6 +130,12 @@ namespace FMS_adapter
 
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int isMounted(IntPtr THIS);
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void exportFile(IntPtr THIS, string exportDir, string fileName, string fileOwner, FCB fcb = null);
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern double getStatus(IntPtr THIS);
+
+
 
     }
 }

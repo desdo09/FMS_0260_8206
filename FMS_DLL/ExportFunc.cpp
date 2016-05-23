@@ -374,6 +374,25 @@ extern "C"
 			throw ex;
 		}
 	}
+	__declspec(dllexport) void  seekToRecId(FCB* THIS, unsigned long id)
+	{
+		try
+		{
+			THIS->seekToRecId(id);
+		}
+		catch (ProgramExeption ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
 
 	__declspec(dllexport) void  updateRecCancel(FCB* THIS)
 	{
@@ -439,7 +458,7 @@ extern "C"
 			if (THIS->getfileDesc() == NULL)
 			{
 				THIS->SetLastErrorMessage("File doesn't exist");
-				THIS->SetLastErrorSource("Dll::getDirEntry");
+				THIS->SetLastErrorSource("Dll::getfileDesc");
 				throw;
 			}
 

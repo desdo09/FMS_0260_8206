@@ -45,18 +45,18 @@ namespace FMS_GUI.Windows
             {
                 //check if fcb is null
                 if (currentFile == null)
-                    throw new FMS_adapter.ProgramException("Fcb cannot be null", "Open file");
+                    throw new ArgumentException("Fcb cannot be null");
 
 
                 //get file's DirEntry
                 fileDesc = currentFile.getfileDesc();
                 //check if the DirEntry is null
                 if (fileDesc == null)
-                    throw new Exception("Fatal error, fileDesc is null");
+                    throw new ArgumentException("Fatal error, fileDesc is null");
 
                 //check if the file are .stu
                 if (fileDesc.filename.Substring(fileDesc.filename.LastIndexOf('.')) != ".stud")
-                    throw new Exception("The file is not a student file");
+                    throw new ArgumentException("The file is not a student file");
 
 
                 recList.ItemsSource = allrec;
@@ -66,10 +66,14 @@ namespace FMS_GUI.Windows
                 this.Title = "Open file - " + fileDesc.filename;
 
             }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message, "Open file", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Close();
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Source + ": " + ex.Message, "Open file", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
             }
         }
 
@@ -80,21 +84,20 @@ namespace FMS_GUI.Windows
                 throw new Exception("Fatal error, fileDesc is null");
 
             getAllRecord();
+
         }
 
         private void getAllRecord()
         {
             allrec.Clear();
-            currentFile.seekRec(FCBseekfrom.beginning, 0);
-            Student stud;
-            for (int i = 0; i < fileDesc.eofRecNr; i++)
+            foreach (var item in currentFile.getAllRecord<Student>())
             {
-                stud = new Student();
-                currentFile.readRec((object)stud);
-                if (stud.Id != 0)
-                    allrec.Add(stud);
-                
+
+                allrec.Add(item);
+
             }
+            //  if(allrec.Count>0)
+            // currentFile.writeRec((object)allrec.FirstOrDefault());
 
         }
 
@@ -109,12 +112,72 @@ namespace FMS_GUI.Windows
                     currentFile.writeRec((object)newStud.student);
                     updateData();
                 }
-                else
-                    MessageBox.Show("canceled");
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Source + ": " + ex.Message, "New student", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void deleteStudentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Student currentStud = recList.SelectedItem as Student;
+            if (currentStud == null)
+            {
+                MessageBox.Show("Select a item", "Delete student", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
+            if (
+                       MessageBox.Show("Are you sure you want to delete the object ID " + currentStud.Id + " ?",
+                                       "Delete record",
+                                       MessageBoxButton.YesNo,
+                                       MessageBoxImage.Exclamation)
+                                       ==
+                       MessageBoxResult.Yes
+                       )
+            {
+                currentFile.seekToRecId((ulong)currentStud.Id);
+                currentFile.deleteRec();
+
+                updateData();
+            }
+
+        }
+
+        private void updateStudentButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Student currentStud = recList.SelectedItem as Student;
+                if (currentStud == null)
+                {
+                    MessageBox.Show("Select a item", "Update student", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return;
+                }
+
+                currentFile.seekToRecId((ulong)currentStud.Id);
+                currentFile.readRec(currentStud, 1);
+
+                StudentManager updateStud = new StudentManager(currentStud);
+                updateStud.ShowDialog();
+                if (updateStud.result)
+                {
+                    currentFile.updateRec((object)updateStud.student);
+                    updateData();
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Source + ": " + ex.Message, "Update student", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                currentFile.updateRecCancel();
             }
         }
     }

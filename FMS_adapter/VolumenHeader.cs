@@ -47,12 +47,12 @@ namespace FMS_adapter
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
         string formatDate;
-        public string FormatDate { get { return formatDate.Substring(3, 2) + "/" + formatDate.Substring(0, 2) + "/" + formatDate.Substring(6); } }
+        public string FormatDate { get { return (isFormated) ? (formatDate.Substring(3, 2) + "/" + formatDate.Substring(0, 2) + "/" + formatDate.Substring(6)) : string.Empty; } }
 
         [MarshalAs(UnmanagedType.I1)]
         bool isFormated;
         public bool IsFormated { get { return isFormated; } }
-
+        
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 944)]
         string emptyArea;

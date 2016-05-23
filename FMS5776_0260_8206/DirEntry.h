@@ -34,4 +34,5 @@ public:
 	friend class TestLevel_2;
 	friend class FCB;
 	friend class ExternalFile;
+	friend class RootDir;
 };

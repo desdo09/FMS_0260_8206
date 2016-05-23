@@ -20,6 +20,7 @@ namespace FMS_adapter
         {
             try
             {
+
                 this.myDiskPointer = cppToCsharpAdapter.makeDiskObject();
             }
             catch (DllNotFoundException)

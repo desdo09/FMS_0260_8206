@@ -51,13 +51,13 @@ void Disk::createdisk(string diskName, string owner) {
 
 
 	if (this->mounted)															// Verify if there is a mounted disk
-		throw ProgramExeption("there is a mounted disk","Disk::createdisk");	// If true then throw an exception
+		throw ProgramExeption("there is a mounted disk", "Disk::createdisk");	// If true then throw an exception
 
 	VerifyAndAddExt(diskName);
 
 	if (ifstream(diskName))														// Verify if the directory exist
 		throw ProgramExeption("There is another file with the same name",		// If true then throw an exception
-			"Disk::createdisk");		
+			"Disk::createdisk");
 
 	if (dskfl.is_open())														// In case that is another file opened
 		dskfl.close();															// close it
@@ -97,7 +97,7 @@ void Disk::createdisk(string diskName, string owner) {
 
 	dskfl.write((char *)&dat, sizeof(Sector));									// Write the DAT into the disk
 
-	
+
 	dskfl.close();
 
 	seekToSector(4);
@@ -166,7 +166,7 @@ void Disk::mountdisk(string  fileName)
 	dskfl.seekp(0, ios::beg);													// Return the dskfl to the begin of the file 	
 
 	if (!dskfl.good())
-		throw ProgramExeption("File cannot be opened","Disk::mountdisk");
+		throw ProgramExeption("File cannot be opened", "Disk::mountdisk");
 
 	this->dskfl.read((char *)&vhd, sizeof(Sector));								// Copy the first sector into volume header object
 
@@ -216,28 +216,31 @@ fstream * Disk::getdskfl(void)
 	return nullptr;
 }
 
-void Disk::seekToSector(DATtype FAT, uint index)
+void Disk::seekToSector(DATtype FAT, uint index, int fileheaderSec)
 {
 	index += 1;												// the file header
-	  				
+
 	int i;
 	//Get the file first sector
 	for (i = this->firstIndex(FAT, false) / 2; i < amountOfSectors && index > 1; i++)
 	{
-		
+
 
 		if (FAT[i] && index > 1)							// if is last than 2 then stop 
-			index -=2;										// 2 sectors	
+			index -= 2;										// 2 sectors	
 
-	
+
+
 	}
 
 	if (index > 1)
 		throw ProgramExeption("Overflow error", "Disk::seekToSector");
 
-	
-	seekToSector(i*2 + index);							   // index can be 0 or 1
-	
+	if (fileheaderSec != -1 && i * 2 == fileheaderSec)
+		index = 1;
+
+	seekToSector(i * 2 + index);							   // index can be 0 or 1
+
 }
 
 void Disk::seekToSector(uint index)
@@ -272,7 +275,7 @@ void Disk::writeSector(Sector * sec)
 	if (!this->mounted)
 		throw ProgramExeption("There not mounted disk", "Disk::WriteSector");
 
-	if(!dskfl.is_open())
+	if (!dskfl.is_open())
 		throw ProgramExeption("File's problem", "Disk::WriteSector");
 
 	if (sec->sectorNr == 99999999)
@@ -301,7 +304,7 @@ void Disk::readSector(Sector * sec)
 
 	this->seekToSector(currDiskSectorNr);									// return to the current sector
 
-	
+
 }
 
 void Disk::VerifyAndAddExt(string & file)
@@ -407,7 +410,7 @@ int Disk::firstIndex(DATtype DAT, bool isDAT, uint indexStart)
 	{
 		if (isDAT && !DAT[i] || !isDAT & DAT[i])
 		{
-			return i*2;
+			return i * 2;
 			break;
 		}
 	}
@@ -421,7 +424,7 @@ int Disk::lastIndex(DATtype DAT, bool isDAT)
 	for (int i = 0; i < amountOfSectors; i++)
 	{
 		if (isDAT && !DAT[i] || !isDAT & DAT[i])
-			index = i*2;
+			index = i * 2;
 
 	}
 	return index;
@@ -443,8 +446,6 @@ void Disk::format(string & owner)
 
 	RootDir root;
 	rootdir = root;
-	this->rootdir.msbSector.sectorNr = 2;
-	this->rootdir.lsbSector.sectorNr = 3;
 	seekToSector(2);
 	dskfl.write((char *)&root, sizeof(Sector));										// RootDir take 2 sectors
 	vhd.SetformaDate();
@@ -472,7 +473,7 @@ void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "alloc");
-	
+
 	if (sectoresAmount % 2)
 		sectoresAmount++;
 
@@ -504,9 +505,16 @@ void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 		this->alloc(FAT, 2, algo);
 	}
 	else {
-
+		Sector temp; // using to reset the sectors
 		for (uint i = 0; i < sectoresAmount; i++)
 		{
+			/*Reset clusters*/
+			temp.sectorNr = (index + i) * 2;
+			this->writeSector((index + i) * 2, &temp);
+
+			temp.sectorNr = ((index + i) * 2) + 1;
+			this->writeSector(((index + i) * 2) + 1, &temp);
+			/*Set fat and DAT*/
 			FAT[index + i] = 1;
 			dat.dat[index + i] = 0;
 		}
@@ -632,7 +640,7 @@ void Disk::flush()
 *
 **************************************************/
 
-void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint offsetSize)
+void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize)
 {
 
 	if (!this->mounted)
@@ -641,7 +649,7 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::createfile");
 
-	if (this->rootdir.msbSector.fileExist(fileName.c_str()) || this->rootdir.lsbSector.fileExist(fileName.c_str()))
+	if (this->rootdir[fileName.c_str()] != NULL)
 		throw ProgramExeption("File already exist!", "Disk::createfile");
 
 	if (keyType.compare("I") && keyType.compare("D") && keyType.compare("L"))
@@ -649,11 +657,11 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 
 
 
-	
+
 	FileHeader fh;
 	fh.FAT.reset();
 	int firsSectorIndex;
-	alloc(fh.FAT, sectorSize, Disk::AlgorithmType::first_Fit);
+	alloc(fh.FAT, sectorSize, Disk::AlgorithmType::best_Fit);
 
 	firsSectorIndex = this->firstIndex(fh.FAT, false);
 	fh.fileDesc.fileAddr = firsSectorIndex;									  // File Address (First sector)
@@ -663,7 +671,7 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 	fh.fileDesc.fileSize = sectorSize;										  // File size (Numbers of sectors)
 	memcpy(fh.fileDesc.keyType, keyType.c_str(), 2);						  // Key Type - (I)nt,(L)ong,(D)ouble
 	fh.fileDesc.keyOffset = offset;											  // Where is the key into the record
-	fh.fileDesc.keySize = offsetSize;										  // The key size
+	fh.fileDesc.keySize = keySize;										      // The key size
 	fh.fileDesc.eofRecNr = 0;												  // Last record number where the file is allocated			
 	fh.fileDesc.maxRecSize = regSize;										  // Register size max
 	fh.fileDesc.actualRecSize = regSize;									  // Register size actual
@@ -673,28 +681,20 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 
 	int dirEntryIndex;
 
-	if (amountOfSectors / 2 > firsSectorIndex)
-	{
-		dirEntryIndex = rootdir.msbSector.findNextIndex();
-		if (dirEntryIndex != -1)
-			this->rootdir.msbSector.dirEntry[dirEntryIndex] = fh.fileDesc;
-		else
-			throw ProgramExeption("Folder Full", "createfile");
-	}
+
+	dirEntryIndex = rootdir.findNextIndex();
+
+	if (dirEntryIndex != -1)
+		*this->rootdir[dirEntryIndex] = fh.fileDesc;
 	else
-	{
-		dirEntryIndex = rootdir.lsbSector.findNextIndex();
-		if (dirEntryIndex != -1)
-			this->rootdir.lsbSector.dirEntry[dirEntryIndex] = fh.fileDesc;
-		else
-			throw ProgramExeption("Folder Full", "createfile");
-	}
+		throw ProgramExeption("Folder Full", "createfile");
+
 
 	fh.sectorNr = firsSectorIndex;
 
 	this->seekToSector(firsSectorIndex);
 
-	dskfl.write((char *)&fh,sizeof(Sector));
+	dskfl.write((char *)&fh, sizeof(Sector));
 
 	this->flush();
 }
@@ -707,18 +707,10 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::extendfile");
 
-	bool msbSector = true;
-	short dirIndex = rootdir.msbSector.findDirByName(fileName.c_str());
+	DirEntry * dir = rootdir[fileName.c_str()];
 
-	if (dirIndex == -1)
-	{
-		msbSector = false;
-		dirIndex = rootdir.lsbSector.findDirByName(fileName.c_str());
-	}
-	if (dirIndex == -1)
+	if(dir == NULL)
 		throw ProgramExeption("File not exist!", "Disk::extendfile");
-
-	DirEntry * dir = (msbSector) ? &rootdir.msbSector.dirEntry[dirIndex] : &rootdir.lsbSector.dirEntry[dirIndex];
 
 	if (dir->fileOwner != owner)
 		throw ProgramExeption("The user does not have permission to modify the file", "Disk::extendfile");
@@ -741,25 +733,20 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 
 void Disk::delfile(string & fileName, string & owner)
 {
-	
+
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "Disk::delfile");
 
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::delfile");
 
-	bool msbSector = true;
-	short dirIndex = rootdir.msbSector.findDirByName(fileName.c_str());
+	
+		
 
-	if (dirIndex == -1)
-	{
-		msbSector = false;
-		dirIndex = rootdir.lsbSector.findDirByName(fileName.c_str());
-	}
-	if (dirIndex == -1)
+	DirEntry * dir = rootdir[fileName.c_str()];
+
+	if(dir == NULL)
 		throw ProgramExeption("File not exist!", "Disk::delfile");
-
-	DirEntry * dir = (msbSector) ? &rootdir.msbSector.dirEntry[dirIndex] : &rootdir.lsbSector.dirEntry[dirIndex];
 
 	if (dir->fileOwner != owner)
 		throw ProgramExeption("The user does not have permission to modify the file", "Disk::extendfile");
@@ -791,23 +778,9 @@ DirEntry * Disk::getDir(const char * fileName)
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::getDir");
 
-	bool msbSector = true;
-	short dirIndex = rootdir.msbSector.findDirByName(fileName);
 
-	if (dirIndex == -1)
-	{
-		msbSector = false;
-		dirIndex = rootdir.lsbSector.findDirByName(fileName);
-	}
+	return rootdir[fileName];
 
-	if (dirIndex == -1)
-		return NULL;
-
-	return (msbSector) ? &rootdir.msbSector.dirEntry[dirIndex] : &rootdir.lsbSector.dirEntry[dirIndex];
-
-	
-
-	
 }
 
 FileHeader Disk::getFileHeader(DirEntry * dir)
@@ -839,7 +812,7 @@ FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpenin
 
 	if (fileDir == NULL)
 		return NULL;
-	
+
 	if (type != enumsFMS::FCBtypeToOpening::output && userName.compare(fileDir->fileOwner))
 		throw ProgramExeption("The user is not allowed to write in this file", "Disk::openfile");
 	//Find next sector after File Header
@@ -852,11 +825,11 @@ FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpenin
 	memcpy(key, (buffer.rawData + fileDir->keyOffset), fileDir->keySize);
 
 	return (new FCB(this, *fileDir, getFileHeader(fileDir).getFAT(),
-					NULL,0, 0, type));
-	
+		NULL, 0, 0, type));
 
 
-	
+
+
 }
 
 uint Disk::updateFile(DirEntry file)
@@ -866,19 +839,10 @@ uint Disk::updateFile(DirEntry file)
 
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::updateFile");
-	int index = rootdir.lsbSector.findDirByName(file.filename);
-	if (index != -1)
-		rootdir.lsbSector.dirEntry[index] = file;
-	else
-	{
-		index = rootdir.msbSector.findDirByName(file.filename);
-		if (index == -1)
-			throw ProgramExeption("File doesn't exist", "Disk::updateFile");
 
-		rootdir.msbSector.dirEntry[index] = file;
-	}
+	*rootdir[file.filename] = file;
 
-	FileHeader fh =  getFileHeader(&file);
+	FileHeader fh = getFileHeader(&file);
 	fh.fileDesc = file;
 
 	writeSector(file.fileAddr, (Sector *)&fh);
@@ -906,30 +870,25 @@ DirEntry * Disk::getDirEntry(int index, SectorDir * sector)
 		if (index < 14)
 			return &sector->dirEntry[index];
 		else
-			throw ProgramExeption("Each folder contains max 14 files","Disk::getDirEntry");
+			throw ProgramExeption("Each folder contains max 14 files", "Disk::getDirEntry");
 
-	if (index < 28)
-		if (index < 14)
-			if(this->rootdir.msbSector.dirEntry[index].entryStatus == 1 )
-				return &this->rootdir.msbSector.dirEntry[index];
-			else return NULL;
-		else
-			if (this->rootdir.lsbSector.dirEntry[index - 14].entryStatus == 1)
-				return &this->rootdir.lsbSector.dirEntry[index - 14];
-			else return NULL;
-	else
-		throw ProgramExeption("The root folder contains max 14 files","Disk::getDirEntry");
+	if (this->rootdir[index] != NULL && this->rootdir[index]->entryStatus == 1)
+		return this->rootdir[index];
+
+	return NULL;
 }
 
 bool Disk::dirExist(int index, SectorDir * sec)
 {
-	bool check;
-	if (index < 14)
-		check = this->rootdir.msbSector.dirEntry[index].entryStatus == 1;
-	else
-		check =  this->rootdir.lsbSector.dirEntry[index-14].entryStatus == 1;
 
-	return check;
+	if (sec != NULL && sec[index].dirEntry->entryStatus == 1)
+		return true;
+
+	if (this->rootdir[index] != NULL && this->rootdir[index]->entryStatus == 1)
+		return true;
+
+	return false;
+
 }
 
 bool Disk::IsFormated()

@@ -35,7 +35,9 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
             }
             catch
             {
@@ -62,12 +64,46 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
             }
             catch
             {
                 throw;
             }
+        }
+
+        public IEnumerable<T> getAllRecord<T>() where T : class, new()
+        {
+            List<T> allRec = new List<T>();
+            this.seekRec(FCBseekfrom.beginning, 0);
+            T obj;
+            int eof = getfileDesc().eofRecNr;
+
+
+
+            for (int i = 0; i < eof; i++)
+            {
+                try
+                {
+                    obj = new T();
+                    this.readRec((object)obj);
+                    allRec.Add((obj as T));
+                }
+                catch (Exception)
+                {
+                    IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
+                    string message = Marshal.PtrToStringAnsi(cString);
+                    cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                    string source = Marshal.PtrToStringAnsi(cString);
+                    new ProgramException(message, source);
+
+                }
+            }
+
+
+            return allRec;
         }
 
         public void writeRec(object source)
@@ -85,11 +121,13 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string esource = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, esource);
             }
-            catch(Exception)
+            catch (Exception)
             { throw; }
-            
+
         }
 
         public void seekRec(FCBseekfrom from, int pos)
@@ -102,7 +140,9 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
             }
             catch
             {
@@ -110,6 +150,25 @@ namespace FMS_adapter
             }
         }
 
+        public void seekToRecId(ulong id)
+        {
+            try
+            {
+                cppToCsharpAdapter.seekToRecId(this.myFCBpointer, id);
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public void updateRecCancel()
         {
             try
@@ -120,7 +179,9 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
             }
             catch
             {
@@ -138,7 +199,9 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
             }
             catch
             {
@@ -159,7 +222,9 @@ namespace FMS_adapter
             {
                 IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                throw new Exception(message);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string esource = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, esource);
             }
             catch
             {
@@ -187,9 +252,9 @@ namespace FMS_adapter
             }
             catch (SEHException)
             {
-                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myFCBpointer);
+                IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
                 string message = Marshal.PtrToStringAnsi(cString);
-                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myFCBpointer);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
 

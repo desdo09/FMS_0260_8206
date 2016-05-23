@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FMS_GUI.Windows"
         mc:Ignorable="d"
-        Title="FileOpen" Height="500" Width="550" ResizeMode="CanMinimize">
+        Title="FileOpen" Height="500" Width="560" ResizeMode="CanMinimize">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
@@ -64,7 +64,7 @@
                     
                 </Button>
                 
-                <Button Grid.Column="1" Name="updateStudentButton" >
+                <Button Grid.Column="1" Name="updateStudentButton" Click="updateStudentButton_Click" >
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>
@@ -76,7 +76,7 @@
 
                 </Button>
 
-                <Button Grid.Column="2" Name="deleteStudentButton">
+                <Button Grid.Column="2" Name="deleteStudentButton" Click="deleteStudentButton_Click">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*"/>

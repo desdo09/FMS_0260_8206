@@ -34,7 +34,7 @@ public:
 		FCB(Disk * d = NULL);
 		FCB (Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned long currRecNr, uint currRecNrInBuff, enumsFMS::FCBtypeToOpening type);
 		~FCB(){ 
-			closefile();
+		
 			
 		}
 		
@@ -65,10 +65,32 @@ public:
 
 		void SetLastErrorSource(string lastErrorSource) { this->lastErrorSource = lastErrorSource; }
 
+
+
 		void closefile();
 
 		void flushfile();
 
+		/*************************************************
+		* FUNCTION
+		*    read
+		*
+		* RETURN VALUE
+		*	This function doesn't return parameters
+		*
+		* PARAMETERS
+		*   char * Data 		- The object where the data will be saved
+		*	bool   update		- If the read operation is to update the data
+		*
+		* MEANING
+		*     This functions will:
+		*			+ Read the current register from the current sector in buffer 
+		*			+ Transfer the data to the object
+		*			+ Check if is to update:
+		*				+ if not, then will go to the next record
+		*				+ if yes, then lock the fcb
+		*
+		**************************************************/
 		void read(char *, bool update = false);
 
 		void write(char * data,int recordInFile = -1 );
@@ -80,6 +102,9 @@ public:
 		void deleteRec();
 
 		void update(char *);
+
+		void seekToRecId(unsigned long id);
+
 
 		friend class Disk;
 

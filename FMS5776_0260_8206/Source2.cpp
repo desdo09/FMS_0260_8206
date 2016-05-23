@@ -5,6 +5,36 @@
 #include "DirEntry.h"
 #include "Dir.h"
 
+ class Student
+{
+
+public:
+	int _id;
+		
+	char _Name[20];
+	
+
+	int _year;
+
+
+	float _average;
+	
+	void printStudent()
+	{
+		cout << _id << ": " << _Name << endl;
+	}
+	Student(int id, string name, int year, float average)
+	{
+		this->_id = id;
+		memcpy(this->_Name,name.c_str(),20);
+		this->_year = year;
+		this->_average = average;
+	}
+	Student()
+	{
+
+	}
+ };
 
 
 void main()
@@ -19,23 +49,40 @@ void main()
 		cout << sizeof(SectorDir)<<endl;
 		cout << sizeof(DirEntry) << endl;
 
-		d.mountdisk("C:\\Users\\User\\Desktop\\Disk.bin");
-
-		//fcb = d.openfile("MG_0006.JPG", "David", enumsFMS::FCBtypeToOpening::inputOutput);
-
-		//ExternalFile a("text.txt");
-
-		//a.importFromFcb(fcb);
-		//a.exportFile("C:\\Users\\User\\Desktop\\News");
+		d.mountdisk("C:\\Users\\User\\Desktop\\TheDisk.bin");
 		
-		string str = "";
-		for (int i = 0; i < 1600; i++)
+		fcb = d.openfile("a.stud", "David", enumsFMS::FCBtypeToOpening::inputOutput);
+		if (fcb == NULL)
 		{
-			str += (d.getDatDAt()[i]) ? ("1") : ("0");
+			cout << "Fcb error" << endl;
+			system("Pause");
+			return;
 		}
-		cout << str<<endl;
+		char ** allData;
+		Student * stud ;
+
+		for (int i = 1; i <= 10; i++)
+		{
+			cout << "Total rec in file --> " << fcb->fileTotalRec() << endl;
+			stud = new Student(i, ((string)"Name " + to_string(i)), i % 6, rand() % 100);
+			fcb->write((char *)stud);
+			delete stud;
+		}
+
+		allData = fcb->getAllFile();
+		for (int i = 0; i < fcb->fileTotalRec(); i++)
+		{
+		
+			if (allData[i] != NULL)
+			{
+				stud = new Student();
+				memcpy(stud, allData[i], sizeof(Student));
+				stud->printStudent();
+				delete stud;
+			}
+		}
 	
-	
+
 	}
 	catch (ProgramExeption ex)
 	{

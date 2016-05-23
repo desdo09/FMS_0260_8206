@@ -233,7 +233,7 @@ public:
 	*	to the sector asked through the FAT 
 	*
 	***************************************************/
-	void seekToSector(DATtype FAT,uint);
+	void seekToSector(DATtype FAT,uint, int = -1);
 	/*************************************************
 	* FUNCTION
 	*   writeSector
@@ -452,7 +452,7 @@ public:
 	*	The Amount of sectors	- Type: unsigned int
 	*	The key type			- Type: string
 	*	The key offset			- Type: unsigned int
-	*	The offset size			- Type: unsigned int
+	*	The key size			- Type: unsigned int
 	*
 	* RETURN VALUE
 	*
@@ -464,7 +464,7 @@ public:
 	*	allocate the file into the disk.
 	*
 	***************************************************/
-	void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint offsetSize);
+	void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize);
 
 	/*************************************************
 	* FUNCTION

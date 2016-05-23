@@ -100,6 +100,9 @@ namespace FMS_adapter
         public static extern void seekRec(IntPtr THIS, uint from, int pos);
 
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void seekToRecId(IntPtr THIS, ulong from);
+
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void updateRecCancel(IntPtr THIS);
 
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]

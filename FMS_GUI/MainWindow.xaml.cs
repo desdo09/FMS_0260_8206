@@ -17,6 +17,8 @@ using FMS_GUI.Windows;
 using FMS_GUI.Classes;
 using WinForms = System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Globalization;
 
 namespace FMS_GUI
 {
@@ -30,6 +32,7 @@ namespace FMS_GUI
         /*Objects*/
         public Disk currentDisk;
         private VolumeHeader vhd;
+
         private List<DirEntry> allFiles;
         private double diskUsed
         {
@@ -40,24 +43,63 @@ namespace FMS_GUI
         public MainWindow()
         {
             InitializeComponent();
-         
-            currentDisk = null;
-            fileList.ItemsSource = allFiles;
 
+            currentDisk = null;
+
+            fileList.ItemsSource = allFiles;
+            this.Loaded += MainWindow_Loaded;
 
 
         }
 
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            try
+            {
+                if (!string.IsNullOrEmpty(App.args))
+                {
+                    //  MessageBox.Show(App.args, "main");
+                    this.mountDisk(App.args.Replace(@"\", @"\\"));
+                }
+            }
+            catch (FMS_adapter.ProgramException ex)
+            {
+                MessageBox.Show(ex.Message, ex.Source, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+            catch (Exception ex)
+            {
+                new FMS_adapter.ProgramException(ex.Message);
+                MessageBox.Show(ex.Message, ex.Source, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+
+
+
+
         #region Operations
         public void mountDisk(string path)
         {
+
+
+            currentDisk = new Disk();
+
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentException("Path cannot be null");
+
             currentDisk.Mountdisk(path);
+
             updateFileList();
+
             vhd = currentDisk.GetVolumeHeader();
+
+            if (vhd == null)
+                throw new ArgumentException("vhd cannot be null");
 
             if (!vhd.IsFormated)
             {
-                if (MessageBox.Show("\nYou need to format the disk before you can used,\n\nformat now?", "New Disk", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                MessageBoxResult? rst = MessageBox.Show("\nYou need to format the disk before you can used,\n\nformat now?", "New Disk", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (rst != null && rst == MessageBoxResult.Yes)
                 {
                     formatDisk();
                     MessageBox.Show("Format complete", "Format Disk", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
@@ -66,13 +108,14 @@ namespace FMS_GUI
             }
 
 
-
-
             if (vhd.IsFormated)
                 updateFileList();
+            else
+                diskDataGrid.Items.Add(vhd);
 
 
-            MessageBox.Show("Name:" + vhd.DiskName + "\nOwner:" + vhd.DiskOwner);
+
+
 
 
         }
@@ -95,6 +138,11 @@ namespace FMS_GUI
             allFiles = currentDisk.getDirEntryInRootDir();
 
             fileList.ItemsSource = allFiles;
+
+            if (diskDataGrid.Items.Count > 0)
+                diskDataGrid.Items.Clear();
+            if (vhd != null)
+                diskDataGrid.Items.Add(vhd);
 
             diskUsed = 1600 - this.currentDisk.Howmuchempty();
 
@@ -172,6 +220,8 @@ namespace FMS_GUI
         {
             try
             {
+                if (currentDisk == null)
+                    throw new Exception("Select a mounted disk");
                 if (
                 MessageBox.Show("WARNING: Formatting will erase ALL data on this disk.\nTo format the disk, click OK. To quit click CANCEL", "Format Disk",
                                 MessageBoxButton.OKCancel,
@@ -193,14 +243,13 @@ namespace FMS_GUI
                 MessageBox.Show(ex.Message, "Format Disk", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
-
         private void unmountButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (currentDisk == null || !currentDisk.isMounted())
                 {
-                    MessageBox.Show("There is no mounted disk", "Disk info", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Select a mounted disk", "Disk info", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -217,6 +266,7 @@ namespace FMS_GUI
 
                 diskUsedLabel.Content = "";
 
+
             }
             catch (Exception ex)
             {
@@ -228,7 +278,7 @@ namespace FMS_GUI
         {
             if (currentDisk == null || !currentDisk.isMounted())
             {
-                MessageBox.Show("Mount disk is necessary", "New file");
+                MessageBox.Show("Select a mounted disk", "New file");
                 return;
             }
             try
@@ -259,11 +309,15 @@ namespace FMS_GUI
                 MessageBox.Show(ex.Source + ": " + ex.Message, "New file");
             }
         }
-
         private void deleteButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                if (currentDisk == null || !currentDisk.isMounted())
+                {
+                    MessageBox.Show("Select a mounted disk", "Delete file");
+                    return;
+                }
                 DirEntry current = fileList.SelectedItem as DirEntry;
                 if (current != null)
                 {
@@ -287,12 +341,11 @@ namespace FMS_GUI
                 MessageBox.Show(ex.Source + ": " + ex.Message, "Delete file");
             }
         }
-
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
             if (currentDisk == null || !currentDisk.isMounted())
             {
-                MessageBox.Show("Mount disk is necessary", "Save file");
+                MessageBox.Show("Select a mounted disk", "Save file");
                 return;
             }
             string dir;
@@ -318,12 +371,11 @@ namespace FMS_GUI
                     status.Close();
             }
         }
-
         private void diskInfoButton_Click(object sender, RoutedEventArgs e)
         {
             if (currentDisk == null || !currentDisk.isMounted())
             {
-                MessageBox.Show("There is no mounted disk", "Disk info", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Select a mounted disk", "Disk info");
                 return;
             }
 
@@ -340,11 +392,15 @@ namespace FMS_GUI
 
 
         }
-
         private void openButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                if (currentDisk == null || !currentDisk.isMounted())
+                {
+                    MessageBox.Show("Select a mounted disk", "Open file");
+                    return;
+                }
                 DirEntry current = fileList.SelectedItem as DirEntry;
                 if (current == null)
                     throw new Exception("Select a file");
@@ -360,6 +416,20 @@ namespace FMS_GUI
             }
         }
         #endregion
+
+
+        private void diskDataGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            DataGrid dg = sender as DataGrid;
+            if (dg == null)
+                return;
+            if (dg.RowDetailsVisibilityMode == DataGridRowDetailsVisibilityMode.VisibleWhenSelected)
+                dg.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.Collapsed;
+            else
+                dg.RowDetailsVisibilityMode = DataGridRowDetailsVisibilityMode.VisibleWhenSelected;
+
+        }
     }
+
 
 }

@@ -5,12 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FMS_GUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        
+        Title="File manager system" Height="600" Width="800">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="{x:Null}" />
         </Style>
         <Style TargetType="Label">
+            <Setter Property="Background" Value="{x:Null}" />
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="CheckBox">
             <Setter Property="Background" Value="{x:Null}" />
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -154,17 +162,60 @@
                 </Grid>
             </Grid>
             <!--Datagrid-->
-            <Grid Grid.Row="1" Margin="0,2,0,28" Grid.RowSpan="2">
+            <Grid Grid.Row="1" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
-                <ListView Grid.Column="0" Background="{x:Null}">
+                <!--Disks datagrid-->
+                <DataGrid Grid.Column="0" Name="diskDataGrid" Background="{x:Null}" HeadersVisibility="None" IsReadOnly="True" AutoGenerateColumns="False"  GridLinesVisibility="None" RowDetailsVisibilityMode="VisibleWhenSelected"  MouseDown="diskDataGrid_MouseLeave">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn  Width="5" IsReadOnly="True" >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image  Source="Images/disk_icon.ico" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Binding="{Binding DiskName}" Width="*"/>
+                    </DataGrid.Columns>
+                    <DataGrid.RowDetailsTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
 
-                </ListView>
-                    <GridSplitter x:Name="gridSplitter" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}" Width="3"/>
-                <Canvas Grid.Column="1" >
-                </Canvas>
+                                <Label Grid.Column="0" Grid.Row="0" Content="Name: " />
+                                <Label Grid.Column="1" Grid.Row="0" Content="{Binding DiskName}"/>
+
+
+                                <Label Grid.Column="0" Grid.Row="1" Content="Owner: "/>
+                                <Label Grid.Column="1" Grid.Row="1" Content="{Binding DiskOwner}"/>
+
+                                <Label Grid.Column="0" Grid.Row="2" Content="Produced date: "/>
+                                <Label Grid.Column="1" Grid.Row="2" Content="{Binding ProdDate}"/>
+
+                                <Label Grid.Column="0" Grid.Row="3"  Content="Is formated: "/>
+                                <Label Grid.Column="1" Grid.Row="3"  Content="{Binding IsFormated}" />
+
+                                <Label Grid.Column="0" Grid.Row="4" Content="FormatDate: "/>
+                                <Label Grid.Column="1" Grid.Row="4" Content="{Binding FormatDate}"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </DataGrid.RowDetailsTemplate>
+                </DataGrid>
+                <GridSplitter x:Name="gridSplitter" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}" Width="3"/>
+                <!--files datagrid-->
                 <DataGrid Grid.Column="2" Name="fileList" IsReadOnly="True" AutoGenerateColumns="False" Background="{x:Null}" GridLinesVisibility="None">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Image" Width="auto" IsReadOnly="True" >
@@ -190,7 +241,7 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <Label x:Name="totalItemsLabel" Grid.Column="0"  Content="0 items" FontSize="10px" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  />
-                <ProgressBar Name="DiskUsedBar" Grid.Column="1" Maximum="1600"  BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" Margin="5,4,5,5" Foreground="#FF6FB0F5" Background="{x:Null}" />
+                <ProgressBar Name="DiskUsedBar" Grid.Column="1" Maximum="1600"  BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" Margin="5" Foreground="#FF6FB0F5" Background="{x:Null}" />
                 <Label x:Name="diskUsedLabel" Grid.Column="1" Background="{x:Null}" />
             </Grid>
         </Grid>

@@ -1,6 +1,7 @@
 #include "ExternalFile.h"
 #include <chrono>
 #include <thread>
+#pragma warning(disable: 4244)
 
 ExternalFileSec::ExternalFileSec()
 {
@@ -115,14 +116,9 @@ void ExternalFile::importFromFcb(FCB * fcb)
 	{
 		if (i == 1245)
 			cout << "";
-		try
-		{
-			fcb->read((char *)&fileMemory[i]);
-		}
-		catch (const std::exception&)
-		{
-
-		}
+		
+		fcb->read((char *)&fileMemory[i]);
+		
 		
 		if (status != NULL)
 			*status = (i / (fileSizeInDisk - 1)) * 100;
@@ -176,7 +172,6 @@ void ExternalFile::exportFile(char * exPatch)
 
 		if (i != fileSizeInDisk - 1)
 		{
-
 			file.write(fileMemory[i].filemem, 1018);
 		}
 		else

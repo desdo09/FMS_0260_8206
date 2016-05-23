@@ -119,6 +119,7 @@
     <ClInclude Include="FileHeader.h" />
     <ClInclude Include="ProgramExeption.h" />
     <ClInclude Include="Sector.h" />
+    <ClInclude Include="Students.h" />
     <ClInclude Include="TestLevel_0.h" />
     <ClInclude Include="TestLevel_2.h" />
     <ClInclude Include="VolumeHeader.h" />

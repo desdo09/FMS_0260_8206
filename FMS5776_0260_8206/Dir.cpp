@@ -44,6 +44,8 @@ short SectorDir::findDirByName(const char * fileName)
 
 RootDir::RootDir()
 {
+	msbSector.sectorNr = 2;
+	lsbSector.sectorNr = 3;
 }
 
 RootDir::~RootDir()

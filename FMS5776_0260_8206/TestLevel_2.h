@@ -3,6 +3,7 @@
 #include "Disk.h"
 #include "TestLevel_0.h"
 #include "FileHeader.h"
+#include "Students.h"
 
 
 class TestLevel_2
@@ -10,20 +11,17 @@ class TestLevel_2
 public:
 
 
-	static void createFile(Disk * d)
+	static void createFile(Disk * d,string fileName = "Students" )
 	{
-		string  fileName;
-		string  ownerFile;
+		
 		uint sectorSize;
 
-		cout << "Enter the file name" << endl;
-		cin >> fileName;
-		cout << "Enter the owner of the file" << endl;
-		cin >> ownerFile;
+		cout << "file name: "<< fileName << endl;
+		cout << "The owner: "<<"David" << endl;
 		cout << "Enter the number of sectors" << endl;
 		cin >> sectorSize;
 
-		d->createfile(fileName, ownerFile, false, 120, sectorSize, "i", 12, 4);
+		d->createfile(fileName, (string)"David", false, sizeof(Student), sectorSize, "I", 0, 4);
 		printHeader(d, fileName.c_str());
 	}
 
@@ -47,14 +45,40 @@ public:
 	static void printHeader(Disk * d, const char * file = NULL)
 	{
 		char fileName[12];
-		
+
 		if (file != NULL)
-			memcpy(fileName,file,12);
+			memcpy(fileName, file, 12);
 		else {
 			cout << "Insert the file name:" << endl;
 			cin >> fileName;
 		}
 		DirEntry * dir = d->getDir(fileName);
+
+		if (dir == NULL)
+		{
+			throw "File doesn't exist";
+			return;
+		}
+
+		cout << "File Name -->" << dir->filename << endl;
+		cout << "File Owner -->" << dir->fileOwner << endl;
+		cout << "File Address -->" << dir->fileAddr << endl;
+		cout << "Created Date -->" << dir->crDate << endl;
+		cout << "File size -->" << dir->fileSize << endl;
+		cout << "End of Record Nr -->" << dir->eofRecNr << endl;
+		cout << "Max rec size -->" << dir->maxRecSize << endl;
+		cout << "Actual Rec Size -->" << dir->actualRecSize << endl;
+		cout << "Rec Format -->" << dir->recFormat << endl;
+		cout << "Key offset -->" << dir->keyOffset << endl;
+		cout << "Key Size -->" << dir->keySize << endl;
+		cout << "Key Type -->" << dir->keyType << endl;
+
+
+
+	}
+	static void printHeader(DirEntry * dir)
+	{
+	
 
 		if (dir == NULL)
 		{

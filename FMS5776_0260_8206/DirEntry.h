@@ -19,6 +19,7 @@ class DirEntry
 
 
 public:
+	char * getname() { return filename; }
 	DirEntry();
 	~DirEntry();
 
@@ -32,5 +33,6 @@ public:
 	friend class SectorDir;
 	friend class TestLevel_2;
 	friend class FCB;
+	friend class ExternalFile;
+	friend class RootDir;
 };
-

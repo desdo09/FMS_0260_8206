@@ -28,8 +28,9 @@ bool SectorDir::fileExist(const char * fileName)
 	return false;
 }
 
-short SectorDir::findDirByName(const char * fileName)
+short SectorDir::findDirByName(const char fileName[12])
 {
+	
 	for (short i = 0; i < 14; ++i)
 	{
 		if (!strcmp(this->dirEntry[i].filename, fileName))

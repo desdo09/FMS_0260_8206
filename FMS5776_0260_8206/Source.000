@@ -4,6 +4,7 @@
 #include "TestLevel_2.h"
 #include "FCB.h"
 #include "Students.h"
+#include "ExternalFile.h"
 
 enum menu{	clear = 1,																			 // Others
 			testLevel0 , createDisk, mountDisk, unmountDisk, flush, printDiskDetails,            // Level 0
@@ -46,7 +47,7 @@ void main() {
 
 
 
-		
+			cout << "Size of file" << ExternalFile::calculateFileSize("TheDisk.bin") << endl;
 			
 			cout << "Select option:" << endl;
 			cout << "\n\t\t<100> Exit " << endl;
@@ -207,7 +208,7 @@ void main() {
 			case PAStudents:
 				cout << "Total rec in file --> " << fcb->fileTotalRec() << endl;
 				allData = fcb->getAllFile();
-				for (int i = 0; i < fcb->fileTotalRec(); i++)
+				for (uint i = 0; i < fcb->fileTotalRec(); i++)
 				{
 					if (allData[i] != NULL)
 					{

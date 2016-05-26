@@ -12,6 +12,9 @@ FCB::FCB(Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned lon
 	this->fileDesc = fileDesc;
 	this->FAT = FAT;
 	this->currSecNr = &d->currDiskSectorNr;
+
+	maxRecPerSec = sizeof(Sector) / fileDesc.actualRecSize;
+
 	if (Buffer != NULL)
 		this->Buffer = *Buffer;
 	else
@@ -23,6 +26,8 @@ FCB::FCB(Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned lon
 	this->currRecNrInBuff = currRecNrInBuff;
 	this->type = type;
 	lock = false;
+
+
 }
 
 FCB::FCB(Disk * d)
@@ -71,28 +76,30 @@ void FCB::read(char * Data, bool update)
 		throw ProgramExeption("The user have no permission to read", "FCB::read");
 
 	//check if the sector pointer was changed 
-	if(this->currSecNrInBuff != *this->currSecNr)
+	if (this->currSecNrInBuff != *this->currSecNr)
 		this->seek(FCBseekfrom::current, 0);
+	else
+		this->currRecNr = getKey();
 
 	if (currRecNr)
 	{
-		for (int i = 0; i < fileDesc.actualRecSize; i++)
+		for (uint i = 0; i < fileDesc.actualRecSize; i++)
 		{
-			*(Data + i) = *(Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + i);			
+			*(Data + i) = *(Buffer.getData() + (currRecNrInBuff % maxRecPerSec)*fileDesc.actualRecSize + i);
 		}
 	}
 	else
-		throw ProgramExeption("No record found!", "FCB::read");
+	{
+		this->seek(FCBseekfrom::current, 1);
+		this->read(Data, update);
+		return;
+	}
 
 	lock = update;
 
 	if (!lock) // in case is unlocked then seek to the next record
-	{
-		currRecNrInBuff++; 
-
-		if (currRecNrInBuff / fileDesc.fileSize > 0) // in case that was the last record
-			this->seek(enumsFMS::FCBseekfrom::current, 1); // seek to the next sector 
-
+	{        
+		this->seek(enumsFMS::FCBseekfrom::current, 1); // seek to the next sector 
 		this->currRecNr = getKey();
 	
 	}
@@ -122,14 +129,14 @@ void FCB::write(char * data, int recordInFile)
 
 	char * alldata = this->Buffer.getData();
 
-	memcpy(alldata + currRecNrInBuff*fileDesc.actualRecSize, data, fileDesc.actualRecSize);
+	memcpy(alldata + (currRecNrInBuff % maxRecPerSec)*fileDesc.actualRecSize, data, fileDesc.actualRecSize);
 
 	
 	d->writeSector(&this->Buffer);
 
 	currRecNrInBuff++;
 
-	if (currRecNrInBuff > fileDesc.eofRecNr)
+	if (currRecNrInBuff + 1 > fileDesc.eofRecNr)
 		fileDesc.eofRecNr = currRecNrInBuff;
 
 	this->flushfile();
@@ -157,23 +164,21 @@ void FCB::seek(enumsFMS::FCBseekfrom from, int toRecord)
 	if (from == enumsFMS::eof)
 		toRecord = fileDesc.eofRecNr;
 
-	int JumpToSector =													 // Amount sector to jump equal 
-						( toRecord)										 // Amount records to jump	
-							/											 // Divided by
-						((sizeof(Sector) - 4) / fileDesc.actualRecSize); // Record per sector
-	
+	int JumpToSector = toRecord / maxRecPerSec;
 
 
-
-	d->seekToSector(FAT, JumpToSector);
+	//if(*this->currSecNr == this->currSecNrInBuff && this->currSecNrInBuff != toRecord/maxRecPerSec) // check if is necessary to seek again
+	d->seekToSector(FAT, JumpToSector,fileDesc.fileAddr);
 
 	this->d->readSector(&this->Buffer);
 
 	this->currSecNrInBuff = *this->currSecNr;
 
 	this->currRecNrInBuff = toRecord;
+
+	if(fileDesc.eofRecNr>0)
+		this->currRecNr = getKey();
 	
-	this->currRecNr = getKey();
 
 
 
@@ -190,9 +195,7 @@ void FCB::updateCancel()
 
 void FCB::deleteRec()
 {
-	if (!lock)
-		throw ProgramExeption("Operation are not allowed", "FCB::deleteRec");
-
+	
 	if (d == NULL)
 		throw ProgramExeption("There is no disk loaded", "FCB::deleteRec");
 		
@@ -205,13 +208,15 @@ void FCB::deleteRec()
 
 	long zero = 0;
 
-	memcpy((this->Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + fileDesc.keyOffset), &zero, fileDesc.keySize);
+	memcpy((this->Buffer.getData() + (currRecNrInBuff % maxRecPerSec)*fileDesc.actualRecSize + fileDesc.keyOffset), &zero, fileDesc.keySize);
 	
 	lock = false;
+
+	fileDesc.eofRecNr--;
 	
 	d->writeSector(&this->Buffer);
 
-
+	this->flushfile();
 }
 
 void FCB::update(char * update)
@@ -225,14 +230,16 @@ void FCB::update(char * update)
 	if (type == FCBtypeToOpening::output || type == FCBtypeToOpening::input)
 		throw ProgramExeption("The user have no permission to write", "FCB::update");
 
-	if (currRecNrInBuff < fileDesc.eofRecNr || !getKey())
+	if (!currRecNr)
 		throw ProgramExeption("No data found", "FCB::update");
 
 	char * alldata = this->Buffer.getData();
 
-	memcpy(alldata + currRecNrInBuff*fileDesc.actualRecSize, update, fileDesc.actualRecSize);
+	memcpy(alldata + (currRecNrInBuff % maxRecPerSec)*fileDesc.actualRecSize, update, fileDesc.actualRecSize);
 
 	d->writeSector(&this->Buffer);
+
+	lock = false;
 
 	this->flushfile();
 }
@@ -248,7 +255,7 @@ unsigned long FCB::getKey()
 
 	unsigned long key = 0;
 
-	memcpy(&key, (this->Buffer.getData() + currRecNrInBuff*fileDesc.actualRecSize + fileDesc.keyOffset), fileDesc.keySize);
+	memcpy(&key, (this->Buffer.getData() + (currRecNrInBuff % maxRecPerSec)*fileDesc.actualRecSize + fileDesc.keyOffset), fileDesc.keySize);
 
 	return key;
 }
@@ -265,7 +272,7 @@ char ** FCB::getAllFile()
 
 
 	this->seek(FCBseekfrom::beginning, 0);
-	for (int i = 0; i < fileDesc.eofRecNr; i++)
+	for (uint i = 0; i < fileDesc.eofRecNr; i++)
 	{
 		if (currRecNr)		//check if the key is not 0
 		{
@@ -275,10 +282,32 @@ char ** FCB::getAllFile()
 		else
 		{
 			file[i] = NULL;
+			this->seek(FCBseekfrom::current, 1);
 		}
 	}
 	return file;
 }
 
+void FCB::seekToRecId(unsigned long id)
+{
+	if (fileDesc.eofRecNr == 0)
+		throw ProgramExeption("File empty","FCB::seekToRecId");
+
+	
+
+	this->seek(FCBseekfrom::beginning, 0);
+	for (uint i = 0; i < fileDesc.eofRecNr; i++)
+	{
+		if (!currRecNr)
+			i--;
+
+		if (currRecNr != id)
+			this->seek(FCBseekfrom::current, 1);
+		else
+			return;
+		
+	}
+	throw ProgramExeption("id doesn't exist", "FCB::seekToRecId");
+}
 
 

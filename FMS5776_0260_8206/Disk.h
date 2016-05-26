@@ -18,8 +18,9 @@ private:
 	fstream       dskfl;
 	uint          currDiskSectorNr;
 	Sector        buffer;
-
-
+	string		  lastErrorMessage;
+	string		  lastErrorSource;
+	double		  status = 0;			//For dll
 	/*************************************************
 	*
 	*				Private function from
@@ -94,8 +95,16 @@ public:
 	*
 	**************************************************/
 	bool getMounted() { return mounted; }
+	
 	DATtype  getDatDAt() { return dat.Getdat(); }
+	
+	string& GetLastErrorMessage() { return this->lastErrorMessage; } 
 
+	string& GetLastErrorSource() { return this->lastErrorSource; }
+	
+	void SetLastErrorMessage(string lastErrorMessage) { this->lastErrorMessage = lastErrorMessage; }
+	
+	void SetLastErrorSource(string lastErrorSource) { this->lastErrorSource = lastErrorSource; }
 
 	/*************************************************
 	* 
@@ -224,7 +233,7 @@ public:
 	*	to the sector asked through the FAT 
 	*
 	***************************************************/
-	void seekToSector(DATtype FAT,uint);
+	void seekToSector(DATtype FAT,uint, int = -1);
 	/*************************************************
 	* FUNCTION
 	*   writeSector
@@ -335,7 +344,7 @@ public:
 	*
 	*
 	***************************************************/
-	uint howmuchempty(uint);
+	uint howmuchempty(uint = 0);
 
 	/*************************************************
 	* FUNCTION
@@ -443,7 +452,7 @@ public:
 	*	The Amount of sectors	- Type: unsigned int
 	*	The key type			- Type: string
 	*	The key offset			- Type: unsigned int
-	*	The offset size			- Type: unsigned int
+	*	The key size			- Type: unsigned int
 	*
 	* RETURN VALUE
 	*
@@ -455,7 +464,8 @@ public:
 	*	allocate the file into the disk.
 	*
 	***************************************************/
-	void createfile(string & , string & , bool , uint , uint , string, uint , uint );
+	void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize);
+
 	/*************************************************
 	* FUNCTION
 	*
@@ -555,6 +565,22 @@ public:
 	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
 
 	uint updateFile(DirEntry);
+
+	/*************************************************
+	*
+	*				  Functions to Dll
+	*
+	**************************************************/
+
+	VolumeHeader getVolumeHeader() { return vhd; }
+
+	DirEntry * getDirEntry(int index,SectorDir * sector = NULL);
+
+	bool dirExist(int index,SectorDir * = NULL);
+
+	bool IsFormated();
+
+	double * getStatus() { return &this->status; }
 
 	/*************************************************
 	*

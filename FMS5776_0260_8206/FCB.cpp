@@ -1,5 +1,5 @@
 ﻿#include "FCB.h"
-#include "Students.h"
+
 using namespace enumsFMS;
 
 
@@ -29,6 +29,59 @@ FCB::FCB(Disk * d, DirEntry fileDesc, DATtype FAT, Sector * Buffer, unsigned lon
 
 
 }
+
+
+/*Private functions*/
+
+void FCB::findLastRecord()
+{
+	
+	this->seek(FCBseekfrom::beginning, 0);
+	for (uint i = 0; i < fileDesc.eofRecNr; i++)
+	{
+		if (!currRecNr)
+			i--;
+
+		this->seek(FCBseekfrom::current, 1);
+
+	}
+	
+}
+
+bool FCB::findEmptySpace()
+{
+	
+	this->seek(FCBseekfrom::beginning, 0);
+	for (uint i = 0; i < fileDesc.eofRecNr; i++)
+	{
+		if (!currRecNr)
+			return true;
+
+		this->seek(FCBseekfrom::current, 1);
+
+	}
+	return false;
+}
+
+int FCB::getSectorNrInDisk(int recNumber)
+{
+	recNumber += 1;													// the file header
+
+	int i;
+	//Get the file first sector
+	for (i = (this->d->firstIndex(this->FAT, false) / 2); i < amountOfSectors && recNumber > 1; i++)
+	{
+		if (FAT[i] && recNumber > 1)								// if is last than 2 then stop 
+			recNumber -= 2;											// 2 sectors	
+	}
+
+	if (recNumber > 1)												//To much sectors to jump or file is full
+		return -1;												
+
+	return  i * 2 + recNumber; 											// index can be 0 or 1
+}
+
+/*Private functions*/
 
 FCB::FCB(Disk * d)
 {
@@ -158,19 +211,36 @@ void FCB::seek(enumsFMS::FCBseekfrom from, int toRecord)
 	if(fileDesc.recFormat == "V" && (from == enumsFMS::FCBseekfrom::current || toRecord != 0) )
 		throw ProgramExeption("Operation are not allowed", "FCB::seek");
 
+	
+
+
 	if (from == enumsFMS::current)
 			toRecord += this->currRecNrInBuff;
 	
 	if (from == enumsFMS::eof)
-		toRecord = fileDesc.eofRecNr;
+	{
+		findLastRecord();
+		//check if is not the last sector
+		if (currSecNrInBuff >= d->lastIndex(FAT, false) && currRecNrInBuff%maxRecPerSec == maxRecPerSec - 1)
+			if (!findEmptySpace())
+				throw ProgramExeption("File is full", "FCB::seek");
+		else
+			this->seek(FCBseekfrom::current, 1);
+		return;
+	}
 
-	int JumpToSector = toRecord / maxRecPerSec;
+	int JumpToSector = getSectorNrInDisk(toRecord / maxRecPerSec);
 
+	if (JumpToSector == -1)
+		throw ProgramExeption("The file cannot seek to this record", "FCB::seek");
 
-	//if(*this->currSecNr == this->currSecNrInBuff && this->currSecNrInBuff != toRecord/maxRecPerSec) // check if is necessary to seek again
-	d->seekToSector(FAT, JumpToSector,fileDesc.fileAddr);
+	
+	if (JumpToSector != currSecNrInBuff || currSecNrInBuff != *currSecNr)
+	{
+		d->seekToSector(JumpToSector);
 
-	this->d->readSector(&this->Buffer);
+		this->d->readSector(&this->Buffer);
+	}
 
 	this->currSecNrInBuff = *this->currSecNr;
 
@@ -205,6 +275,9 @@ void FCB::deleteRec()
 	//check if the sector pointer was changed 
 	if (this->currSecNrInBuff != *this->currSecNr)
 		this->seek(FCBseekfrom::current, 0);
+
+	if (!currRecNr)
+		return;
 
 	long zero = 0;
 
@@ -308,6 +381,12 @@ void FCB::seekToRecId(unsigned long id)
 		
 	}
 	throw ProgramExeption("id doesn't exist", "FCB::seekToRecId");
+}
+
+void FCB::extendfile(uint amountOfSectores)
+{
+	this->d->extendfile((string) this->fileDesc.filename,(string) this->fileDesc.fileOwner, amountOfSectores,this);
+	this->flushfile();
 }
 
 

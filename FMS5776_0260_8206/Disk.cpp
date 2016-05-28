@@ -216,32 +216,6 @@ fstream * Disk::getdskfl(void)
 	return nullptr;
 }
 
-void Disk::seekToSector(DATtype FAT, uint index, int fileheaderSec)
-{
-	index += 1;												// the file header
-
-	int i;
-	//Get the file first sector
-	for (i = this->firstIndex(FAT, false) / 2; i < amountOfSectors && index > 1; i++)
-	{
-
-
-		if (FAT[i] && index > 1)							// if is last than 2 then stop 
-			index -= 2;										// 2 sectors	
-
-
-
-	}
-
-	if (index > 1)
-		throw ProgramExeption("Overflow error", "Disk::seekToSector");
-
-	if (fileheaderSec != -1 && i * 2 == fileheaderSec)
-		index = 1;
-
-	seekToSector(i * 2 + index);							   // index can be 0 or 1
-
-}
 
 void Disk::seekToSector(uint index)
 {
@@ -302,7 +276,6 @@ void Disk::readSector(Sector * sec)
 
 	dskfl.read((char *)sec, sizeof(Sector));
 
-	this->seekToSector(currDiskSectorNr);									// return to the current sector
 
 
 }
@@ -424,7 +397,7 @@ int Disk::lastIndex(DATtype DAT, bool isDAT)
 	for (int i = 0; i < amountOfSectors; i++)
 	{
 		if (isDAT && !DAT[i] || !isDAT & DAT[i])
-			index = i * 2;
+			index = i * 2 + 1;
 
 	}
 	return index;
@@ -444,10 +417,10 @@ void Disk::format(string & owner)
 	this->recreatedisk();
 
 
-	RootDir root;
-	rootdir = root;
+
+	rootdir = RootDir();
 	seekToSector(2);
-	dskfl.write((char *)&root, sizeof(Sector));										// RootDir take 2 sectors
+	dskfl.write((char *)&rootdir, sizeof(Sector));										// RootDir take 2 sectors
 	vhd.SetformaDate();
 	vhd.isFormated = true;
 	this->flush();
@@ -457,6 +430,7 @@ uint Disk::howmuchempty(uint index)
 {
 	if (index == 0)
 		return (int)dat.dat.count();
+
 	int counter = 0;
 	for (int i = index; i < amountOfSectors; i++)
 	{
@@ -477,7 +451,7 @@ void Disk::alloc(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 	if (sectoresAmount % 2)
 		sectoresAmount++;
 
-	if (howmuchempty() < sectoresAmount)
+	if (howmuchempty() * 2 < sectoresAmount)
 		throw ProgramExeption("No space left", "alloc");
 
 	sectoresAmount /= 2;																			// cluster = 2 sectores
@@ -531,27 +505,21 @@ void Disk::allocextend(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 		throw ProgramExeption("This disk is not formatted", "allocextend");
 
 
-	if (howmuchempty() < sectoresAmount)
-		throw ProgramExeption("No space left", "alloc");
-
-	sectoresAmount /= 2;																			// cluster = 2 sectores
+	if (sectoresAmount % 2)
+		sectoresAmount++;
 
 
+	sectoresAmount /= 2;														// cluster = 2 sectores
 
 	if (howmuchempty() < sectoresAmount)
 		throw ProgramExeption("No space left", "allocextend");
 
-	int startindex;																// Object to save the last index in FAT
+	int startindex = firstIndex(FAT, false) / 2;									// Object to save the last index in FAT
 
-	//Search the last index into the FAT
-	for (int i = 0; i < amountOfSectors; i++)
-	{
-		if (FAT[i])
-			startindex = i;
-	}
 
-	if (howmuchempty(startindex) > sectoresAmount)								// In case that doesn't have place to allocate after the last index
-		startindex = 4;															// then reset index (4)
+
+	if (howmuchempty(startindex) < sectoresAmount)								// In case that doesn't have place to allocate after the last index
+		startindex = 2;															// then reset index (4)
 
 	int index;
 
@@ -577,8 +545,6 @@ void Disk::allocextend(DATtype & FAT, uint sectoresAmount, AlgorithmType algo)
 	}
 	else {
 
-		if (sectoresAmount % 2)											// a cluster are 2 sectors
-			sectoresAmount++;
 
 		for (uint i = 0; i < sectoresAmount; i++)
 		{
@@ -661,14 +627,14 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 	FileHeader fh;
 	fh.FAT.reset();
 	int firsSectorIndex;
-	alloc(fh.FAT, sectorSize, Disk::AlgorithmType::best_Fit);
+	alloc(fh.FAT, sectorSize + 1, Disk::AlgorithmType::best_Fit);			 // Plus one for the file header
 
 	firsSectorIndex = this->firstIndex(fh.FAT, false);
 	fh.fileDesc.fileAddr = firsSectorIndex;									  // File Address (First sector)
 	memcpy(fh.fileDesc.filename, fileName.c_str(), 12);				          // File name
 	memcpy(fh.fileDesc.fileOwner, ownerFile.c_str(), 12);					  // File Owner
 	_strdate_s(fh.fileDesc.crDate);											  // Created date
-	fh.fileDesc.fileSize = sectorSize;										  // File size (Numbers of sectors)
+	fh.fileDesc.fileSize = sectorSize + 1;									  // File size (Numbers of sectors)
 	memcpy(fh.fileDesc.keyType, keyType.c_str(), 2);						  // Key Type - (I)nt,(L)ong,(D)ouble
 	fh.fileDesc.keyOffset = offset;											  // Where is the key into the record
 	fh.fileDesc.keySize = keySize;										      // The key size
@@ -699,7 +665,7 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 	this->flush();
 }
 
-void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
+void Disk::extendfile(string & fileName, string & owner, uint sectorSize, FCB * file)
 {
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "Disk::extendfile");
@@ -709,7 +675,7 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 
 	DirEntry * dir = rootdir[fileName.c_str()];
 
-	if(dir == NULL)
+	if (dir == NULL)
 		throw ProgramExeption("File not exist!", "Disk::extendfile");
 
 	if (dir->fileOwner != owner)
@@ -720,14 +686,23 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize)
 
 	FileHeader fh = getFileHeader(dir);
 
-	allocextend(fh.FAT, sectorSize, Disk::AlgorithmType::first_Fit);
+	allocextend(fh.FAT, sectorSize, Disk::AlgorithmType::best_Fit);
 
 	seekToSector(dir->fileAddr);
 
 	dskfl.write((char *)&fh, sizeof(Sector));
 
+	fh.fileDesc.fileSize = fh.FAT.count() * 2;
 
+	rootdir[fh.fileDesc.filename]->fileSize = fh.fileDesc.fileSize;
 
+	if (file != NULL)
+	{
+		file->FAT = fh.FAT;
+		file->fileDesc = fh.fileDesc;
+	}
+
+	this->flush();
 
 }
 
@@ -740,12 +715,12 @@ void Disk::delfile(string & fileName, string & owner)
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::delfile");
 
-	
-		
+
+
 
 	DirEntry * dir = rootdir[fileName.c_str()];
 
-	if(dir == NULL)
+	if (dir == NULL)
 		throw ProgramExeption("File not exist!", "Disk::delfile");
 
 	if (dir->fileOwner != owner)
@@ -759,6 +734,8 @@ void Disk::delfile(string & fileName, string & owner)
 	seekToSector(dir->fileAddr);
 
 	dskfl.read((char *)&fh, sizeof(Sector));
+
+	writeSector(dir->fileAddr, new Sector(dir->fileAddr));
 
 	dealloc(fh.FAT);
 
@@ -848,6 +825,84 @@ uint Disk::updateFile(DirEntry file)
 	writeSector(file.fileAddr, (Sector *)&fh);
 
 	return file.fileAddr + 1;
+}
+
+void Disk::defragmentation()
+{
+	int a;
+
+	Sector * disk = new Sector[3192];									// Array with contain all disk data;
+
+	DirEntry * currentFile;												// The current file used
+
+	FileHeader  fh;														// The file header 
+
+	DATtype newFAT;														// The new fat
+
+	RootDir rootCopy = this->rootdir;									// Save a rootDir copy 
+
+	this->seekToSector(4);												// Seek to sector 4 
+
+	for (int i = 0; i < 3192; i++)
+	{
+		this->readSector(&disk[i]);										// Get all disk data
+	}
+
+	this->format((string)vhd.diskOwner);								// Format the disk
+
+	this->seekToSector(4);												// Return to sector 4
+
+	for (int j = 0; j < 28; j++)
+	{
+
+		newFAT.reset();													// Reset the FAT (put all bite in 0)
+
+		currentFile = rootCopy[j];										// Get file
+
+		if (currentFile->entryStatus != 1)								// If the file doesn't exist or was delete the go to the next file
+			continue;
+
+		memcpy(&fh, &disk[currentFile->fileAddr - 4], sizeof(Sector));	// Save the file header
+
+
+		for (int i = 0; i < 1600; i++)
+		{
+			if (!fh.FAT[i])												// Find the used cluster
+				continue;
+
+			this->dat.dat[currDiskSectorNr / 2] = 0;					// Set the DAT
+
+			newFAT[currDiskSectorNr / 2] = 1;							// Set the FAT 
+
+			disk[i * 2 - 4] = currDiskSectorNr;							// Change the sector value 
+
+			this->writeSector(&disk[i * 2-4]);							// Write into the disk
+
+			// cluster = 2 sectors
+			disk[(i * 2) + 1 - 4] = currDiskSectorNr;
+			this->writeSector(&disk[(i * 2) + 1 - 4]);
+
+		}
+
+		currentFile->fileAddr = this->firstIndex(newFAT,false);			// Set the file address	
+
+		fh.sectorNr = currentFile->fileAddr;							// Set the file header 
+
+		fh.fileDesc = *currentFile;
+
+		fh.FAT = newFAT;
+
+		this->writeSector(currentFile->fileAddr, (Sector *)&fh);		// write the file header
+
+		this->seekToSector(this->lastIndex(fh.FAT,false) + 1);			// return to the last sector writer 
+
+		*this->rootdir[rootdir.findNextIndex()] = *currentFile;			// Set the new root dir
+
+	}
+
+	this->flush();
+
+	delete [] disk;
 }
 
 /*************************************************

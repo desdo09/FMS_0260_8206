@@ -128,9 +128,6 @@
     <ClInclude Include="FileHeader.h" />
     <ClInclude Include="ProgramExeption.h" />
     <ClInclude Include="Sector.h" />
-    <ClInclude Include="Students.h" />
-    <ClInclude Include="TestLevel_0.h" />
-    <ClInclude Include="TestLevel_2.h" />
     <ClInclude Include="VolumeHeader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -142,7 +139,6 @@
     <ClCompile Include="FCB.cpp" />
     <ClCompile Include="FileHeader.cpp" />
     <ClCompile Include="Sector.cpp" />
-    <ClCompile Include="Source2.cpp" />
     <ClCompile Include="VolumeHeader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -105,7 +105,7 @@ public:
 
 		void deleteRec();
 
-		void update(char *);
+		void update(char * = NULL);
 
 		void seekToRecId(unsigned long id);
 

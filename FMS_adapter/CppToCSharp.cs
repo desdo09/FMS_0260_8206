@@ -79,6 +79,8 @@ namespace FMS_adapter
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void extendfile(IntPtr THIS, string fileName, string fileOwner, uint size);
 
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void flush(IntPtr THIS);
 
         // Level 3
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
@@ -114,6 +116,12 @@ namespace FMS_adapter
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void getfileDesc(IntPtr THIS, IntPtr Dir);
 
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr getFAT(IntPtr THIS);
+
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void FCBextendfile(IntPtr THIS, uint size);
+
         // extra
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getDat(IntPtr THIS);
@@ -133,12 +141,16 @@ namespace FMS_adapter
 
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int isMounted(IntPtr THIS);
+
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void exportFile(IntPtr THIS, string exportDir, string fileName, string fileOwner, FCB fcb = null);
+
         [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
         public static extern double getStatus(IntPtr THIS);
 
-
+        //defragmentDisk
+        [DllImport(dllPath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void defragmentDisk(IntPtr THIS);
 
     }
 }

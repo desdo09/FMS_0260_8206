@@ -22,7 +22,10 @@ namespace FMS_adapter
         ~FCB()
         {
             if (myFCBpointer != null)
+            {
+                //  cppToCsharpAdapter.closefile(myFCBpointer);
                 cppToCsharpAdapter.deleteFcbObject(ref myFCBpointer);
+            }
         }
 
         public void Closefile()
@@ -258,6 +261,48 @@ namespace FMS_adapter
                 string source = Marshal.PtrToStringAnsi(cString);
                 throw new ProgramException(message, source);
 
+            }
+        }
+
+        public string getFAT()
+        {
+            try
+            {
+                IntPtr DAT = cppToCsharpAdapter.getFAT(this.myFCBpointer);
+                return Marshal.PtrToStringAnsi(DAT).ToString();
+
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+
+
+
+        }
+
+
+        public void extendfile(uint AmountOfSectors)
+        {
+            try
+            {
+                cppToCsharpAdapter.FCBextendfile(this.myFCBpointer, AmountOfSectors);
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastFcbErrorMessage(this.myFCBpointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastFcbErrorSource(this.myFCBpointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+            catch
+            {
+                throw;
             }
         }
     }

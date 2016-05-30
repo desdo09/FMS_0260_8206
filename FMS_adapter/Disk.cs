@@ -31,10 +31,20 @@ namespace FMS_adapter
 
         ~Disk()
         {
+
             if (myDiskPointer != null)
+            {
                 cppToCsharpAdapter.deleteDiskObject(ref myDiskPointer);
+            }
         }
 
+        public string diskPointer
+        {
+            get
+            {
+                return Marshal.PtrToStringAuto(myDiskPointer);
+            }
+        }
 
         public VolumeHeader GetVolumeHeader()
         {
@@ -320,6 +330,21 @@ namespace FMS_adapter
 
         }
 
+        public void flush()
+        {
+            try
+            {
+                cppToCsharpAdapter.flush(this.myDiskPointer);
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myDiskPointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myDiskPointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+        }
 
         // Level 3
 
@@ -386,7 +411,41 @@ namespace FMS_adapter
         }
         public double getStatus()
         {
-            return cppToCsharpAdapter.getStatus(this.myDiskPointer);
+
+            try
+            {
+                return cppToCsharpAdapter.getStatus(this.myDiskPointer);
+
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myDiskPointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myDiskPointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+
+
+        }
+
+        public void defragment()
+        {
+
+            try
+            {
+
+                cppToCsharpAdapter.defragmentDisk(this.myDiskPointer);
+            }
+            catch (SEHException)
+            {
+                IntPtr cString = cppToCsharpAdapter.getLastDiskErrorMessage(this.myDiskPointer);
+                string message = Marshal.PtrToStringAnsi(cString);
+                cString = cppToCsharpAdapter.getLastDiskErrorSource(this.myDiskPointer);
+                string source = Marshal.PtrToStringAnsi(cString);
+                throw new ProgramException(message, source);
+            }
+
         }
     }
 }

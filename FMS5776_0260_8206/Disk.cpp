@@ -686,15 +686,23 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize, FCB * 
 
 	FileHeader fh = getFileHeader(dir);
 
-	allocextend(fh.FAT, sectorSize, Disk::AlgorithmType::best_Fit);
+	int currentAddr = fh.fileDesc.fileAddr;																			// Save the last address	
 
-	seekToSector(dir->fileAddr);
+	allocextend(fh.FAT, sectorSize, Disk::AlgorithmType::best_Fit);													// Get new FAT
+	
+	this->writeSector(currentAddr, new Sector(currentAddr));														// Reset previous file header sector
+	
+	fh.fileDesc.fileSize = fh.FAT.count() * 2;																		// Update the file size into the file header
 
-	dskfl.write((char *)&fh, sizeof(Sector));
+	rootdir[fh.fileDesc.filename]->fileSize = fh.fileDesc.fileSize;												    // Update the file size into the root dir
 
-	fh.fileDesc.fileSize = fh.FAT.count() * 2;
+	fh.fileDesc.fileAddr = this->firstIndex(fh.FAT, false);															// Get the first FAT index and save into filedesc
 
-	rootdir[fh.fileDesc.filename]->fileSize = fh.fileDesc.fileSize;
+	this->rootdir[fh.fileDesc.filename]->fileAddr = fh.fileDesc.fileAddr;											// Update the address into the root directory
+
+	this->writeSector(fh.fileDesc.fileAddr, (Sector *)&fh);															// Save file header
+
+
 
 	if (file != NULL)
 	{
@@ -829,8 +837,6 @@ uint Disk::updateFile(DirEntry file)
 
 void Disk::defragmentation()
 {
-	int a;
-
 	Sector * disk = new Sector[3192];									// Array with contain all disk data;
 
 	DirEntry * currentFile;												// The current file used
@@ -874,12 +880,12 @@ void Disk::defragmentation()
 
 			newFAT[currDiskSectorNr / 2] = 1;							// Set the FAT 
 
-			disk[i * 2 - 4] = currDiskSectorNr;							// Change the sector value 
+			disk[(i * 2) - 4].sectorNr = currDiskSectorNr;				// Change the sector value 
 
-			this->writeSector(&disk[i * 2-4]);							// Write into the disk
+			this->writeSector(&disk[(i * 2) - 4]);						// Write into the disk
 
 			// cluster = 2 sectors
-			disk[(i * 2) + 1 - 4] = currDiskSectorNr;
+			disk[(i * 2) + 1 - 4].sectorNr = currDiskSectorNr;
 			this->writeSector(&disk[(i * 2) + 1 - 4]);
 
 		}

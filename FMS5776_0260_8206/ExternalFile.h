@@ -45,11 +45,9 @@ public:
 	
 		long fileSize = (long) file.tellg();
 
-		cout << "Default filesize: "<< fileSize << endl;
-
 		file.close();
 
-		if (fileSize % 1018 == 0)
+		if (fileSize % 1018 == 0)											// Add 1 to the fileHeader
 			return fileSize / 1018 + 1;
 		else
 			return (fileSize / 1018) + 2;

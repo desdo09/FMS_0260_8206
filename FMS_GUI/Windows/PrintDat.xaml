@@ -50,6 +50,7 @@
                     <Label Name="fileSizeLabel"/>
 
                 </StackPanel>
+                <Button Content="Extend file" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,35,15,0" Click="expandButton_Click"/>
             </StackPanel>
                     
             <Canvas Name="DatMap" Height="400px" Width="800" Grid.Row="1" Background="#FFC7C7C7" HorizontalAlignment="Center">

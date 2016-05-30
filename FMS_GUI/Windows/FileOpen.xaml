@@ -34,8 +34,9 @@
                 </Grid.ColumnDefinitions>
 
                 <Image Source="/FMS_GUI;component/Images/open_file.fw.png" Margin="2px"/>
-                <Label Content="Open file" FontSize="26px" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Label Content="Open file" FontSize="26px" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Grid>
+            
             <DataGrid Grid.Row="1" Name="recList" IsReadOnly="True" AutoGenerateColumns="False" Background="{x:Null}" GridLinesVisibility="None" Margin="5px,0">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Student id" Binding="{Binding Id}" Width="*"/>
@@ -44,6 +45,7 @@
                     <DataGridTextColumn Header="Student average" Binding="{Binding Averange}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
+            <Label Grid.Row="1" Name="counterLabel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Total items: 0" FontSize="8px" Margin="0,0,5px,0" Background="{DynamicResource {x:Static SystemColors.InactiveCaptionBrushKey}}" BorderBrush="Black" OpacityMask="Black" BorderThickness="1,1,1,0" />
             <Grid Grid.Row="2" Margin="5px,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>

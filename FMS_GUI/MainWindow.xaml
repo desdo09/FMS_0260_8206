@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FMS_GUI"
         mc:Ignorable="d"
-        
-        Title="File manager system" Height="600" Width="800">
+        Closing="Window_Closing"
+        WindowStartupLocation="CenterScreen"
+        Title="File manager system" MinHeight="600" MinWidth="800"
+        >
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="{x:Null}" />
@@ -28,8 +30,42 @@
     </Window.Resources>
 
     <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <Menu Background="{x:Null}" BorderBrush="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" BorderThickness="0,0,0,1"   >
+                <MenuItem Header="File"  HorizontalAlignment="Right"  HorizontalContentAlignment="Right">
+                    <MenuItem Header="New disk" Click="newDiskButton_Click"  />
+                    <MenuItem Header="Mount disk" Click="mountButton_Click" />
+                    <MenuItem Header="Unmount disk" Click="unmountButton_Click"  />
+                    <MenuItem Header="Exit" Click="MenuItem_Click"  />
 
-        <Grid >
+                </MenuItem>
+                <MenuItem Header="Actions" >
+                    <MenuItem Header="Format disk" Click="formatButton_Click"/>
+                    <MenuItem Header="Defragment disk" Click="defragmentButton_Click"/>
+                    <MenuItem Header="Add" IsEnabled="True" >
+                        <MenuItem Header="File"  />
+                        <MenuItem Header="Student"  />
+                    </MenuItem>
+                   
+                </MenuItem>
+                <MenuItem Header="View" >
+                    <MenuItem Header="Disk details" Click="diskInfoButton_Click"  />
+                    <MenuItem Header="DAT" Click="diskInfoButton_Click" />
+                    <MenuItem Header="File details"  Click="fileInfoButton_Click"/>
+                    <MenuItem Header="File FAT" Click="fileInfoButton_Click"  />
+                    <MenuItem Header="Terminal" Click="terminalButton_Click"  />
+                </MenuItem>
+                <MenuItem Header="About" >
+                    <MenuItem Header="Help"  />
+                    <MenuItem Header="About the program" Click="about_Click" />
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1.05*"/>
                 <RowDefinition Height="6*"/>
@@ -44,12 +80,14 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="0.25*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="0.25*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
@@ -57,13 +95,16 @@
                     <Grid.Resources>
                         <BitmapImage x:Key="newDiskImage"    UriSource="Images/new_disk.fw.png" />
                         <BitmapImage x:Key="loadDiskImage"   UriSource="Images/load.fw.png" />
+                        <BitmapImage x:Key="defragmentImage" UriSource="Images/defragment_disk.fw.png" />
                         <BitmapImage x:Key="unloadDiskImage" UriSource="Images/unmount.fw.png" />
                         <BitmapImage x:Key="formatDiskImage" UriSource="Images/format.fw.png" />
                         <BitmapImage x:Key="diskInfoImage"   UriSource="Images/info_disk.fw.png" />
+                        <BitmapImage x:Key="fileInfoImage"   UriSource="Images/info_file.fw.png" />
                         <BitmapImage x:Key="newFileImage"    UriSource="Images/new_file.fw.png" />
                         <BitmapImage x:Key="openFileImage"   UriSource="Images/open_file.fw.png" />
                         <BitmapImage x:Key="saveFileImage"   UriSource="Images/save_file.fw.png" />
                         <BitmapImage x:Key="deleteFileImage" UriSource="Images/delete_file.fw.png" />
+                        <BitmapImage x:Key="terminalImage" UriSource="Images/terminal.png" />
                     </Grid.Resources>
 
                     <Button Grid.Column="0" Name="newDiskButton" Click="newDiskButton_Click">
@@ -106,7 +147,17 @@
                             <Label Content="Disk info" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
                         </Grid>
                     </Button>
-                    <Button Grid.Column="4" Name="unmountButton" Click="unmountButton_Click">
+                    <Button Grid.Column="4" Name="defragmentButton" Click="defragmentButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource defragmentImage}" Margin="3px"/>
+                            <Label Content="Disk defragment" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <Button Grid.Column="5" Name="unmountButton" Click="unmountButton_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
@@ -116,10 +167,10 @@
                             <Label Content="Unmount disk" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
                         </Grid>
                     </Button>
-                    <StackPanel Orientation="Horizontal" Grid.Column="5" HorizontalAlignment="Center" Margin="6,0">
+                    <StackPanel Orientation="Horizontal" Grid.Column="6" HorizontalAlignment="Center" Margin="6,0">
                         <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     </StackPanel>
-                    <Button Grid.Column="6" Name="newButton" Click="newButton_Click">
+                    <Button Grid.Column="7" Name="newButton" Click="newButton_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
@@ -129,7 +180,7 @@
                             <Label Content="New file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
                         </Grid>
                     </Button>
-                    <Button Grid.Column="7" Name="openButton" Click="openButton_Click">
+                    <Button Grid.Column="8" Name="openButton" Click="openButton_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
@@ -139,7 +190,18 @@
                             <Label Content="Open file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
                         </Grid>
                     </Button>
-                    <Button Grid.Column="8" Name="saveButton" Click="saveButton_Click">
+                    <Button Grid.Column="9" Name="fileInfoButton" Click="fileInfoButton_Click" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource fileInfoImage}" Margin="3px"/>
+                            <Label Content="File info" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    
+                    <Button Grid.Column="10" Name="saveButton" Click="saveButton_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
@@ -149,7 +211,7 @@
                             <Label Content="Save file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
                         </Grid>
                     </Button>
-                    <Button Grid.Column="9" Name="deleteButton" Click="deleteButton_Click">
+                    <Button Grid.Column="11" Name="deleteButton" Click="deleteButton_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
@@ -157,6 +219,19 @@
                             </Grid.RowDefinitions>
                             <Image Source="{StaticResource deleteFileImage}" Margin="3px"/>
                             <Label Content="Delete file" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
+                        </Grid>
+                    </Button>
+                    <StackPanel Orientation="Horizontal" Grid.Column="12" HorizontalAlignment="Center" Margin="6,0">
+                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    </StackPanel>
+                    <Button Grid.Column="13" Name="terminalButton" Click="terminalButton_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="0.5*"/>
+                            </Grid.RowDefinitions>
+                            <Image Source="{StaticResource terminalImage}" Margin="3px"/>
+                            <Label Content="Terminal" FontSize="10.667" Grid.Row="1" Padding="0" HorizontalContentAlignment="Center" FontFamily="Tahoma"/>
                         </Grid>
                     </Button>
                 </Grid>
@@ -230,6 +305,7 @@
                         <DataGridTextColumn Header="File address" Binding="{Binding fileAddr}" Width="*"/>
                         <DataGridTextColumn Header="File size" Binding="{Binding fileSize}" Width="*"/>
                         <DataGridTextColumn Header="File create data" Binding="{Binding crDate}"  Width="*" />
+                        <DataGridTextColumn Header="Total records" Binding="{Binding eofRecNr}"  Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

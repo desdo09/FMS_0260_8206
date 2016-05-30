@@ -20,18 +20,20 @@ namespace FMS_GUI.Windows
     /// </summary>
     public partial class PrintDat : Window
     {
-        string map;
-        DirEntry dir;
+        string DAT;
+        FCB fcb = null;
+
+
         public PrintDat(string DAT, VolumeHeader diskData)
         {
             InitializeComponent();
             if (DAT.Length < 1600)
             {
-                MessageBox.Show("map type error", "PrintDat", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("DAT type error", "PrintDat", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
-            this.map = DAT;
-            this.dir = null;
+            this.DAT = DAT;
+
             diskGrid.Visibility = Visibility.Visible;
             diskNameLabel.Content = diskData.DiskName;
             diskOwnerLabel.Content = diskData.DiskOwner;
@@ -41,34 +43,41 @@ namespace FMS_GUI.Windows
             drawMap();
         }
 
-        public PrintDat(string FAT, DirEntry dir)
+        public PrintDat(FCB fcb, string DAT)
         {
             InitializeComponent();
-            if (map.Length < 1600)
+
+            if (DAT.Length < 1600)
             {
-                MessageBox.Show("map type error", "PrintDat", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("DAT type error", "PrintDat", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
-            if (dir == null)
-            {
-                MessageBox.Show("Dir cannot be null", "PrintDat", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
-            }
+
+            if (fcb == null)
+                return;
+
+            DirEntry dir = fcb.getfileDesc();
+
 
             fileGrid.Visibility = Visibility.Visible;
             fileNameLabel.Content = dir.filename;
             fileOwnerLabel.Content = dir.fileOwner;
             filecreatedLabel.Content = dir.crDate;
-            fileSizeLabel.Content = dir.fileSize;
+            int Size = int.Parse(dir.fileSize.Substring(0, dir.fileSize.Length - 3));
+            fileSizeLabel.Content = (Size % 2 == 0) ? dir.fileSize : (Size + 1) + "Kb";
+            this.DAT = DAT;
+            this.fcb = fcb;
 
-            this.map = FAT;
-            this.dir = dir;
             drawMap();
 
         }
 
         public void drawMap()
         {
+            string FAT = null;
+            if (fcb != null)
+                FAT = this.fcb.getFAT();
+
             Rectangle rec;
             //i = Height
             for (int i = 0; i < 20; i++)
@@ -77,9 +86,11 @@ namespace FMS_GUI.Windows
                 for (int j = 0; j < 80; j++)
                 {
                     rec = new Rectangle();
-                    if ((map[(i * 80) + j] == '0' && dir == null) || (map[(i * 80) + j] == '1' && dir != null))
+                    if (DAT[(i * 80) + j] == '0')
                         rec.Fill = Brushes.Gray;
 
+                    if (!string.IsNullOrEmpty(FAT) && FAT[(i * 80) + j] == '1')
+                        rec.Fill = Brushes.Blue;
 
                     rec.Height = 20;
                     Canvas.SetLeft(rec, j * 10);
@@ -89,17 +100,34 @@ namespace FMS_GUI.Windows
                     Canvas.SetTop(rec, i * 20);
                     DatMap.Children.Add(rec);
 
-                    
+
                 }
-               
+
             }
 
+        }
 
+        private void expandButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int total = int.Parse(Prompt.show("How many sectors to expand ?", true));
+                this.fcb.extendfile((uint)total);
+                drawMap();
+                DirEntry dir;
+                dir = fcb.getfileDesc();
+                int Size = int.Parse(dir.fileSize.Substring(0, dir.fileSize.Length - 3));
+                fileSizeLabel.Content = (Size % 2 == 0) ? dir.fileSize : (Size + 1) + "Kb";
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show("Canceled");
 
-
-
-
-
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Expand file", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
         }
     }

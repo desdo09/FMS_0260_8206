@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:FMS_GUI.Windows"
         mc:Ignorable="d"
         Title="statusWindows" Height="100" Width="600"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        >
     <StackPanel Orientation="Vertical">
         <Label x:Name="titleLabel" VerticalAlignment="Center" HorizontalAlignment="Center" Width="500" FontSize="16px" Content="Title" HorizontalContentAlignment="Center"/>
         <ProgressBar Name="progress" Value="0" VerticalAlignment="Center" HorizontalAlignment="Center" Width="500" HorizontalContentAlignment="Center" Height="25px"/>

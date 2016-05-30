@@ -22,9 +22,6 @@
     <Filter Include="Resource Files\Pphysical layer">
       <UniqueIdentifier>{a2ba0160-536d-439e-8105-8688851eabb2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Test class">
-      <UniqueIdentifier>{3b318ea0-150f-4920-b347-22b80bda8e07}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.h">
@@ -54,17 +51,8 @@
     <ClInclude Include="Header.h">
       <Filter>Program Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestLevel_0.h">
-      <Filter>Header Files\Test class</Filter>
-    </ClInclude>
-    <ClInclude Include="TestLevel_2.h">
-      <Filter>Header Files\Test class</Filter>
-    </ClInclude>
     <ClInclude Include="FCB.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Students.h">
-      <Filter>Header Files\Test class</Filter>
     </ClInclude>
     <ClInclude Include="ExternalFile.h">
       <Filter>Header Files</Filter>
@@ -97,9 +85,6 @@
     </ClCompile>
     <ClCompile Include="ExternalFile.cpp">
       <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source2.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

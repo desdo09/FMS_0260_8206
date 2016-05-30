@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMS_adapter", "FMS_adapter\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMS_GUI", "FMS_GUI\FMS_GUI.csproj", "{89D8D9CD-66A4-4479-AB8D-13762A8E19B4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FMS_Console", "FMS_Console\FMS_Console.vcxproj", "{2B2AD512-2BCF-49D6-B08F-220775124873}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,16 @@ Global
 		{89D8D9CD-66A4-4479-AB8D-13762A8E19B4}.Release|x64.Build.0 = Release|Any CPU
 		{89D8D9CD-66A4-4479-AB8D-13762A8E19B4}.Release|x86.ActiveCfg = Release|Any CPU
 		{89D8D9CD-66A4-4479-AB8D-13762A8E19B4}.Release|x86.Build.0 = Release|Any CPU
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Debug|x64.ActiveCfg = Debug|x64
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Debug|x64.Build.0 = Debug|x64
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Debug|x86.ActiveCfg = Debug|Win32
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Debug|x86.Build.0 = Debug|Win32
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Release|Any CPU.ActiveCfg = Release|Win32
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Release|x64.ActiveCfg = Release|x64
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Release|x64.Build.0 = Release|x64
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Release|x86.ActiveCfg = Release|Win32
+		{2B2AD512-2BCF-49D6-B08F-220775124873}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

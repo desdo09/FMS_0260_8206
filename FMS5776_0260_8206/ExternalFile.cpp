@@ -103,7 +103,7 @@ void ExternalFile::importFromFcb(FCB * fcb)
 
 
 	fileSize = fcb->fileDesc.maxRecSize;
-	fileSizeInDisk = fcb->fileDesc.fileSize - 1;
+	fileSizeInDisk = fcb->fileDesc.fileSize;
 	this->path = fcb->fileDesc.filename;
 	this->lastdata = fcb->fileDesc.maxRecSize;
 
@@ -114,12 +114,9 @@ void ExternalFile::importFromFcb(FCB * fcb)
 		*status = 0;
 	for (int i = 0; i < fileSizeInDisk; i++)
 	{
-		if (i == 1245)
-			cout << "";
-		
+				
 		fcb->read((char *)&fileMemory[i]);
-		
-		
+				
 		if (status != NULL)
 			*status = (i / (fileSizeInDisk - 1)) * 100;
 	}

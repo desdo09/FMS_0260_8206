@@ -74,8 +74,14 @@
     <Compile Include="Windows\NewFile.xaml.cs">
       <DependentUpon>NewFile.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\PrintDat.xaml.cs">
       <DependentUpon>PrintDat.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Prompt.xaml.cs">
+      <DependentUpon>Prompt.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\statusWindows.xaml.cs">
       <DependentUpon>statusWindows.xaml</DependentUpon>
@@ -107,7 +113,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\PrintDat.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Prompt.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -179,7 +193,7 @@
     <Resource Include="Images\unmount.fw.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Windows\Pages\" />
+    <Resource Include="Images\disk_icon.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\info_disk.fw.png" />
@@ -201,6 +215,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\disk_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\info_file.fw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\terminal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\defragment_disk.fw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Windows\Pages\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

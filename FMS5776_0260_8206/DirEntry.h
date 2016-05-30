@@ -20,6 +20,7 @@ class DirEntry
 
 public:
 	char * getname() { return filename; }
+	bool active() { return (this->entryStatus == 1); }
 	DirEntry();
 	~DirEntry();
 

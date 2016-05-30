@@ -3,8 +3,8 @@
 #include <string>       // std::string
 #include <iostream>     // std::cout
 #include <sstream>  
-#include "Students.h"
 #include "ExternalFile.h"
+#include "TestLevel_2.h"
 
 
 
@@ -76,7 +76,11 @@ extern "C"
 	{
 		try
 		{
+			
 			THIS->mountdisk(diskName);
+
+
+			
 		}
 		catch (ProgramExeption ex)
 		{
@@ -177,9 +181,10 @@ extern "C"
 	{
 		try
 		{
+			
 
 			if (recSize == 0)
-				recSize = sizeof(Student);
+				recSize = 20;
 
 			string name = ((string)fileName).substr(0, 6);
 			name += ".stud";
@@ -295,7 +300,25 @@ extern "C"
 			throw ex;
 		}
 	}
-
+	__declspec(dllexport) void	flush(Disk* THIS)
+	{
+		try
+		{
+			THIS->flush();
+		}
+		catch (ProgramExeption ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
 
 	// FCB
 	__declspec(dllexport) void  closefile(FCB* THIS)
@@ -478,6 +501,39 @@ extern "C"
 			throw ex;
 		}
 	}
+	__declspec(dllexport) const char*  getFAT(FCB * THIS)
+	{
+		char * str = new char[1601];
+		DATtype FAT = *THIS->getFAT();
+		for (int i = 0; i < 1600; i++)
+		{
+			
+			str[i] = (FAT[i]) ? (char)49 : (char)48;
+		}
+		str[1600] = '\0';
+		return str;
+	}
+	__declspec(dllexport) void  FCBextendfile(FCB* THIS, unsigned int amountOfSectores)
+	{
+		try
+		{
+			THIS->extendfile(amountOfSectores);
+
+		}
+		catch (ProgramExeption ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
+
 
 
 	// extra
@@ -603,5 +659,25 @@ extern "C"
 		str[1600] = '\0';
 		return str;
 	}
-	
+
+
+	__declspec(dllexport) void	defragmentDisk(Disk* THIS)
+	{
+		try
+		{
+			THIS->defragmentation();
+		}
+		catch (ProgramExeption ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource(ex.Getsource());
+			throw ex;
+		}
+		catch (exception ex)
+		{
+			THIS->SetLastErrorMessage(ex.what());
+			THIS->SetLastErrorSource("Dll");
+			throw ex;
+		}
+	}
 }

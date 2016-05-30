@@ -14,7 +14,7 @@ private:
 	VolumeHeader  vhd;
 	DAT           dat;
 	RootDir       rootdir;
-	bool          mounted;
+	bool          mounted = false;
 	fstream       dskfl;
 	uint          currDiskSectorNr;
 	Sector        buffer;
@@ -97,6 +97,8 @@ public:
 	bool getMounted() { return mounted; }
 	
 	DATtype  getDatDAt() { return dat.Getdat(); }
+
+	RootDir getRootDir() { return this->rootdir; }
 	
 	string& GetLastErrorMessage() { return this->lastErrorMessage; } 
 
@@ -219,21 +221,6 @@ public:
 	*
 	***************************************************/
 	void seekToSector(uint);
-	/*************************************************
-	* FUNCTION
-	*   seekToSector
-	* PARAMETERS
-	*	The FAT file
-	*   The sector index
-	* RETURN VALUE
-	*	This function does not return parameters
-	*
-	* MEANING
-	*	The function will seek the fstream object (dskfl)
-	*	to the sector asked through the FAT 
-	*
-	***************************************************/
-	void seekToSector(DATtype FAT,uint, int = -1);
 	/*************************************************
 	* FUNCTION
 	*   writeSector
@@ -487,7 +474,7 @@ public:
 	*	allocext.
 	*
 	***************************************************/
-	void extendfile(string &, string &, uint);
+	void extendfile(string &, string &, uint, FCB * file = NULL);
 
 	/*************************************************
 	* FUNCTION
@@ -565,6 +552,8 @@ public:
 	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
 
 	uint updateFile(DirEntry);
+
+	void defragmentation();
 
 	/*************************************************
 	*

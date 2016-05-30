@@ -6,6 +6,7 @@
 #include "Students.h"
 
 
+
 class TestLevel_2
 {
 public:
@@ -17,12 +18,12 @@ public:
 		uint sectorSize;
 
 		cout << "file name: "<< fileName << endl;
-		cout << "The owner: "<<"David" << endl;
+		cout << "The owner: "<<d->getVolumeHeader().GetdiskOwner() << endl;
 		cout << "Enter the number of sectors" << endl;
 		cin >> sectorSize;
 
-		d->createfile(fileName, (string)"David", false, sizeof(Student), sectorSize, "I", 0, 4);
-		printHeader(d, fileName.c_str());
+		d->createfile(fileName,(string) d->getVolumeHeader().GetdiskOwner(), false, sizeof(Student), sectorSize, "I", 0, 4);
+		//printHeader(d, fileName.c_str());
 	}
 
 	static void extFile(Disk * d)
@@ -103,22 +104,17 @@ public:
 
 	}
 
-	static void DeleteFile(Disk * d)
+	static void DeleteFile(Disk * d,string owner)
 	{
 		string  fileName;
-		string  ownerFile;
 		char ans;
-
+		cin >> fileName;
 		cout << "Are you sure? <Y/N>" << endl;
 		cin >> ans;
 		if (ans == 'y' || ans == 'Y')
 		{
-			cout << "Enter the file name" << endl;
-			cin >> fileName;
-			cout << "Enter the owner of the file" << endl;
-			cin >> ownerFile;
-
-			d->delfile(fileName, ownerFile);
+		
+			d->delfile(fileName, owner);
 		}
 
 

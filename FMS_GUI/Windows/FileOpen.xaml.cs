@@ -25,6 +25,25 @@ namespace FMS_GUI.Windows
         FCB currentFile;
         DirEntry fileDesc;
         ObservableCollection<Student> allrec;
+
+        #region Names
+        static string[] names = new string[] {
+            "Noah","Liam","Mason","Jacob","James","John","Robert","Michael","Mary",
+            "William","Richard","Charles","Joseph","Thomas","Patricia","Christopher",
+            "Linda","Barbara","Daniel","Paul","Mark","Elizabeth","Donalt","Jennifer",
+            "George","Maria"
+        };
+
+        static string[] surnames = new string[]
+        {
+            "Smith","Johnson","Brown","Davis","Miller","Wilson","Moore",
+            "Taylor","Anderson","Thomas","Jackson"
+
+        };
+        #endregion
+
+        public static Random ran = new Random();
+
         public FileOpen(FCB file)
         {
             InitializeComponent();
@@ -32,11 +51,34 @@ namespace FMS_GUI.Windows
             allrec = new ObservableCollection<Student>();
             currentFile = file;
             this.Loaded += FileOpen_Loaded;
+            this.KeyDown += FileOpen_KeyDown;
+            Dispatcher.BeginInvoke(new Action(() =>
+           MessageBox.Show("Due the program is in Beta status, press F1 to create aleatory names", "File open", MessageBoxButton.OK, MessageBoxImage.Information)
+            ));
 
+        }
 
+        private void FileOpen_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.F1)
+                return;
 
+            int lastIndex = 1;
+            if (allrec != null && allrec.Count > 0)
+                lastIndex = allrec.Max(x => x.Id) + 1;
 
+            try
+            {
+                Student stud = new Student(lastIndex, names[ran.Next(names.Length)] + " " + surnames[ran.Next(surnames.Length)], ran.Next(1, 6), ran.Next(100));
 
+                currentFile.writeRec((object)stud);
+                updateData();
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Source + ": " + ex.Message, "Add student", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void FileOpen_Loaded(object sender, RoutedEventArgs e)
@@ -85,6 +127,7 @@ namespace FMS_GUI.Windows
 
             getAllRecord();
 
+
         }
 
         private void getAllRecord()
@@ -96,8 +139,8 @@ namespace FMS_GUI.Windows
                 allrec.Add(item);
 
             }
-            //  if(allrec.Count>0)
-            // currentFile.writeRec((object)allrec.FirstOrDefault());
+            counterLabel.Content = "Total items: " + allrec.Count;
+
 
         }
 
@@ -123,9 +166,20 @@ namespace FMS_GUI.Windows
         private void deleteStudentButton_Click(object sender, RoutedEventArgs e)
         {
             Student currentStud = recList.SelectedItem as Student;
+            Student temp = new Student();
             if (currentStud == null)
             {
                 MessageBox.Show("Select a item", "Delete student", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
+            currentFile.seekToRecId((ulong)currentStud.Id);
+            currentFile.readRec((object)temp, 1);
+
+            if (temp.Id != currentStud.Id)
+            {
+                MessageBox.Show("Operation failed,", "Delete file", MessageBoxButton.OK, MessageBoxImage.Error);
+                currentFile.updateRecCancel();
                 return;
             }
 
@@ -133,16 +187,20 @@ namespace FMS_GUI.Windows
                        MessageBox.Show("Are you sure you want to delete the object ID " + currentStud.Id + " ?",
                                        "Delete record",
                                        MessageBoxButton.YesNo,
-                                       MessageBoxImage.Exclamation)
+                                       MessageBoxImage.Question)
                                        ==
                        MessageBoxResult.Yes
                        )
             {
-                currentFile.seekToRecId((ulong)currentStud.Id);
+
+
+
                 currentFile.deleteRec();
 
                 updateData();
             }
+            else
+                currentFile.updateRecCancel();
 
         }
 

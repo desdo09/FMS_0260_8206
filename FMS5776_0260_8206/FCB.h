@@ -27,6 +27,10 @@ private:
 		string lastErrorMessage;
 		string lastErrorSource;
 
+		void findLastRecord();
+		bool findEmptySpace();
+		int getSectorNrInDisk(int);
+
 public:
 	
 		
@@ -57,7 +61,7 @@ public:
 		string& GetLastErrorSource() { return this->lastErrorSource; }
 
 		DirEntry * getfileDesc() { return &fileDesc;}
-
+		DATtype * getFAT() { return &this->FAT; };
 		
 		/****/
 		
@@ -101,10 +105,11 @@ public:
 
 		void deleteRec();
 
-		void update(char *);
+		void update(char * = NULL);
 
 		void seekToRecId(unsigned long id);
 
+		void extendfile(uint amountOfSectores);
 
 		friend class Disk;
 

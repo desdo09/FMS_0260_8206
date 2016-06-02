@@ -43,6 +43,7 @@ ExternalFile::ExternalFile()
 	fileSizeInDisk = 0;
 	status = 0;
 }
+
 ExternalFile::ExternalFile(const char * path)
 {
 	this->path = (char *)path;
@@ -96,34 +97,6 @@ void ExternalFile::importFile()
 
 }
 
-void ExternalFile::importFromFcb(FCB * fcb)
-{
-	if (fcb == NULL)
-		throw ProgramExeption("Fcb cannot be null", "ExternalFile::importFromFcb");
-
-
-	fileSize = fcb->fileDesc.maxRecSize;
-	fileSizeInDisk = fcb->fileDesc.fileSize;
-	this->path = fcb->fileDesc.filename;
-	this->lastdata = fcb->fileDesc.maxRecSize;
-
-	fileMemory = new ExternalFileSec[fileSizeInDisk];
-
-	fcb->seek(enumsFMS::FCBseekfrom::beginning);
-	if (status != NULL)
-		*status = 0;
-	for (int i = 0; i < fileSizeInDisk; i++)
-	{
-				
-		fcb->read((char *)&fileMemory[i]);
-				
-		if (status != NULL)
-			*status = (i / (fileSizeInDisk - 1)) * 100;
-	}
-
-
-}
-
 void ExternalFile::exportToFcb(FCB * fcb)
 {
 	if (fcb == NULL)
@@ -139,8 +112,45 @@ void ExternalFile::exportToFcb(FCB * fcb)
 			*status = (i / (fileSizeInDisk - 1)) * 100;
 	}
 
-	fcb->fileDesc.maxRecSize = fileSize;
-	fcb->fileDesc.fileSize = fileSizeInDisk;
+	fcb->fileDesc->maxRecSize = lastdata;
+	fcb->fileDesc->fileSize = fileSizeInDisk;
+}
+
+void ExternalFile::importFromFcb(FCB * fcb)
+{
+	if (fcb == NULL)
+		throw ProgramExeption("Fcb cannot be null", "ExternalFile::importFromFcb");
+
+
+	lastdata = fcb->fileDesc->maxRecSize;
+	fileSizeInDisk = fcb->fileDesc->fileSize;
+
+	fileMemory = new ExternalFileSec[fileSizeInDisk];
+
+	fcb->seek(enumsFMS::FCBseekfrom::beginning);
+	if (status != NULL)
+		*status = 0;
+
+
+
+	char * data = new char[1020];
+	unsigned int index;
+	for (int i = 0; i < fileSizeInDisk; i++)
+	{
+				
+		fcb->read(data);
+		index = 0;
+		memcpy(&index, data, sizeof(short));
+		
+		if (index <= fileSizeInDisk)
+			memcpy(&fileMemory[index-1], data,sizeof(ExternalFileSec));
+				
+		if (status != NULL)
+			*status = (i / (fileSizeInDisk - 1)) * 100;
+	}
+
+	delete[] data;
+
 }
 
 void ExternalFile::exportFile(char * exPatch)
@@ -164,6 +174,7 @@ void ExternalFile::exportFile(char * exPatch)
 		throw ProgramExeption("file problem", "ExternalFile::importFile");
 	if (status != NULL)
 		*status = 0;
+
 	for (int i = 0; i < fileSizeInDisk; i++)
 	{
 
@@ -182,7 +193,7 @@ void ExternalFile::exportFile(char * exPatch)
 		if (i == 200)
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
-
+	file.close();
 
 }
 

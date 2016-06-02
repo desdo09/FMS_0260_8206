@@ -451,7 +451,7 @@ public:
 	*	allocate the file into the disk.
 	*
 	***************************************************/
-	void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize);
+	void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize, SectorDir * dir = NULL);
 
 	/*************************************************
 	* FUNCTION
@@ -549,7 +549,7 @@ public:
 	*
 	**************************************************/
 
-	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type);
+	FCB * openfile(string , string , enumsFMS::FCBtypeToOpening type,DirEntry * dir = NULL);
 
 	uint updateFile(DirEntry);
 

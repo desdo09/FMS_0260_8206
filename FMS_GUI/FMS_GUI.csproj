@@ -68,6 +68,9 @@
     <Compile Include="Windows\FileOpen.xaml.cs">
       <DependentUpon>FileOpen.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\loading.xaml.cs">
+      <DependentUpon>loading.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\NewDisk.xaml.cs">
       <DependentUpon>NewDisk.xaml</DependentUpon>
     </Compile>
@@ -102,6 +105,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Windows\FileOpen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\loading.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -227,6 +234,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Windows\Pages\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

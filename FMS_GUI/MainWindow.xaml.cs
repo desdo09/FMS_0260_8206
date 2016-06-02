@@ -55,6 +55,8 @@ namespace FMS_GUI
             this.Loaded += MainWindow_Loaded;
 
 
+
+
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -125,6 +127,7 @@ namespace FMS_GUI
                 {
                     formatDisk();
                     MessageBox.Show("Format complete", "Format Disk", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    vhd = currentDisk.GetVolumeHeader();
                 }
 
             }
@@ -165,8 +168,13 @@ namespace FMS_GUI
 
             if (diskDataGrid.Items.Count > 0)
                 diskDataGrid.Items.Clear();
+
             if (vhd != null)
+            {
+                diskDataGrid.Items.Clear();
                 diskDataGrid.Items.Add(vhd);
+            }
+
 
             diskUsed = 1600 - this.currentDisk.Howmuchempty();
 
@@ -175,6 +183,18 @@ namespace FMS_GUI
             double totalUsed = (diskUsed * 2 / 3200) * 100;
 
             diskUsedLabel.Content = "Total " + 3.200 + " MB, Used " + (diskUsed * 2) + " Kb (" + totalUsed + "%)";
+        }
+
+        public FCB getFcb(string fileName)
+        {
+            FCB file = allFcb.Where(x => x.getfileDesc().filename == fileName).FirstOrDefault();
+            if (file == null)
+            {
+                file = currentDisk.Openfile(fileName, FCBtypeToOpening.inputOutput);
+                allFcb.Add(file);
+            }
+
+            return file;
         }
 
         #endregion
@@ -337,6 +357,9 @@ namespace FMS_GUI
 
                 if (file.result == true)
                 {
+
+                    loading lo = new loading();
+                    lo.Show();
                     switch (file.type)
                     {
                         case NewFile.Type.student:
@@ -348,7 +371,7 @@ namespace FMS_GUI
                         default:
                             break;
                     }
-
+                    lo.Close();
                     updateFileList();
                 }
 
@@ -400,28 +423,40 @@ namespace FMS_GUI
                 MessageBox.Show("Select a mounted disk", "Save file");
                 return;
             }
+
             string dir;
             DirEntry current = fileList.SelectedItem as DirEntry;
-            WinForms.FolderBrowserDialog browser = new WinForms.FolderBrowserDialog();
-            StatusWindows status = new StatusWindows("Exporting file:", currentDisk.getStatus);
+
             try
             {
+                if (current == null)
+                    throw new Exception("Select a file");
+
+                WinForms.FolderBrowserDialog browser = new WinForms.FolderBrowserDialog();
+                loading lo = new loading();
+
+
                 if (browser.ShowDialog() == System.Windows.Forms.DialogResult.OK && current != null)
                 {
                     dir = browser.SelectedPath;
                     dir.Replace(@"\", @"\\");
-                    status.Show();
-                    currentDisk.exportFile(dir, current.filename);
-                    status.Close();
+                    lo.Show();
+                    if (!current.filename.EndsWith(".stud"))
+                        currentDisk.exportFile(dir, current.filename);
+                    else
+                        getFcb(current.filename).exportFile<Student>(browser.SelectedPath + @"\" + current.filename + ".txt");
+
 
                 }
+
+                lo.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Source + ": " + ex.Message, "Save file", MessageBoxButton.OK, MessageBoxImage.Error);
-                if (status.IsLoaded)
-                    status.Close();
+                MessageBox.Show(ex.Message, "Save file", MessageBoxButton.OK, MessageBoxImage.Error);
+
             }
+
         }
         private void diskInfoButton_Click(object sender, RoutedEventArgs e)
         {
@@ -453,16 +488,12 @@ namespace FMS_GUI
                     MessageBox.Show("Select a mounted disk", "Open file");
                     return;
                 }
+
                 DirEntry current = fileList.SelectedItem as DirEntry;
                 if (current == null)
                     throw new Exception("Select a file");
 
-                FCB file = allFcb.Where(x => x.getfileDesc().filename == current.filename).FirstOrDefault();
-                if (file == null)
-                {
-                    file = currentDisk.Openfile(current.filename, FCBtypeToOpening.inputOutput);
-                    allFcb.Add(file);
-                }
+                FCB file = getFcb(current.filename);
 
                 FileOpen update = new FileOpen(file);
                 update.Show();
@@ -484,13 +515,7 @@ namespace FMS_GUI
                 if (current == null)
                     throw new Exception("Select a file");
 
-                FCB file = allFcb.Where(x => x.getfileDesc().filename == current.filename).FirstOrDefault();
-
-                if (file == null)
-                {
-                    file = currentDisk.Openfile(current.filename, FCBtypeToOpening.inputOutput);
-                    allFcb.Add(file);
-                }
+                FCB file = getFcb(current.filename);
                 string dat = currentDisk.getDAT();
                 PrintDat print = new PrintDat(file, dat);
                 print.Show();
@@ -558,6 +583,7 @@ namespace FMS_GUI
         {
             About.showDialog();
         }
+
 
     }
 

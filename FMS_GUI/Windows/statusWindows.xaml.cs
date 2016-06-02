@@ -20,46 +20,55 @@ namespace FMS_GUI.Windows
     /// </summary>
     public partial class StatusWindows : Window
     {
-        Func<double> status = null;
+        static Func<double> status = null;
         public StatusWindows(string title, Func<double> status)
         {
             InitializeComponent();
             titleLabel.Content = title;
-            this.status = status;
-            this.Loaded += StatusWindows_Loaded;
+            StatusWindows.status = status;
+            this.Closing += StatusWindows_Closing;
+
+
+
+        }
+
+        private void StatusWindows_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            status = null;
         }
 
 
-        bool _shown;
-
-        protected override void OnContentRendered(EventArgs e)
+        public void start()
         {
-            base.OnContentRendered(e);
-
-            if (_shown)
-                return;
-
-            _shown = true;
-
-            Action del = () => progress.Value = (double)status();
-            new Thread(() =>
+            Action del = null;
+            del = () =>
             {
-
-                while (status != null)
+                if (status != null)
                 {
-                    //Thread.Sleep(500);
-
-                    Dispatcher.Invoke(del);
-              //      MessageBox.Show(status().ToString());
+                    MessageBox.Show("Del" + status().ToString());
+                    progress.Value = (double)StatusWindows.status();
                 }
+                else MessageBox.Show("Null");
+            };
 
-            }).Start();
+            Thread add = new Thread(() =>
+           {
+
+               while (status != null)
+               {
+                   //Thread.Sleep(500);
+                   if (status != null)
+                       Dispatcher.BeginInvoke(del);
+                //   MessageBox.Show(status().ToString());
+
+               }
+
+           });
+
+            add.Start();
         }
 
-        private void StatusWindows_Loaded(object sender, RoutedEventArgs e)
-        {
 
 
-        }
     }
 }

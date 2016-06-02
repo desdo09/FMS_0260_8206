@@ -79,6 +79,18 @@ namespace FMS_GUI.Classes
         {
 
         }
+
+        public override string ToString()
+        {
+            string name = Name;
+
+            for (int i = 0; i < (20 - name.Length); i++)
+            {
+                name += " ";
+            }
+
+            return "Id: " + Id + " name: " + Name + " year: " + Year + " average: " + Averange;
+        }
     }
 
 }

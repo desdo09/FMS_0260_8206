@@ -78,6 +78,7 @@ public:
 
 	void setStatus(double * satus){
 		this->status=satus;
+		
 	}
 };
 

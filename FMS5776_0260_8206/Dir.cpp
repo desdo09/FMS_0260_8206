@@ -16,7 +16,8 @@ short SectorDir::findNextIndex()
 	for (int i = 0; i < 14; i++)
 		if (this->dirEntry[i].entryStatus == 0 || this->dirEntry[i].entryStatus == 2)
 			return i;
-	return -1;
+
+	throw ProgramExeption("Directory full", "SectorDir::findDirByName");
 }
 bool SectorDir::fileExist(const char * fileName)
 {
@@ -38,6 +39,11 @@ short SectorDir::findDirByName(const char fileName[12])
 	}
 
 	return -1;
+}
+
+void SectorDir::insert(DirEntry * dir)
+{
+	this->dirEntry[this->findNextIndex()] = *dir;
 }
 
 

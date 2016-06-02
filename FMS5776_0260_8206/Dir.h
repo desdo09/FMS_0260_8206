@@ -14,9 +14,15 @@ public:
 	SectorDir();
 	~SectorDir();
 
+	//Find the next DirEntry index available 
 	short findNextIndex();
+	// Check if the file exist into this SectorDir
 	bool  fileExist(const char *);
+	//Get the DirEntry index by a fileName 
 	short findDirByName(const char fileName[12]);
+
+	//insert a directory
+	void insert(DirEntry * dir);
 
 	friend class Disk;
 	friend class RootDir;
@@ -29,12 +35,28 @@ class RootDir
 private:
 	SectorDir msbSector;
 	SectorDir lsbSector;
-	
+
 public:
 	RootDir();
 	~RootDir();
 
-	// The operator get a name and return his DirEntry
+	/*************************************************
+	* FUNCTION
+	*    operator[]
+	*
+	* RETURN VALUE
+	*   The file DirEntry
+	*
+	* PARAMETERS
+	*	char fileName[12] - The file name
+	*
+	* MEANING
+	*   Search into the Rootdir if there a file with the
+	*	name received, in case yes return the his DirEntry
+	*	in case no return null
+	*
+	**************************************************/
+
 	DirEntry * operator[](const char fileName[12])
 	{
 		int index = this->lsbSector.findDirByName(fileName);
@@ -50,10 +72,23 @@ public:
 		}
 	}
 
-	// The operator get an index and return his DirEntry
+	/*************************************************
+	* FUNCTION
+	*    operator[]
+	*
+	* RETURN VALUE
+	*   The file DirEntry
+	*
+	* PARAMETERS
+	*	int index - The file index
+	*
+	* MEANING
+	*	Return the DirEntry although is empty
+	*
+	**************************************************/
 	DirEntry * operator[](uint i)
 	{
-		if(i>27)
+		if (i > 27)
 			throw ProgramExeption("Root directory only contains 28 files", "Rootdir");
 
 		if (i < 14)
@@ -76,11 +111,33 @@ public:
 
 		index = lsbSector.findNextIndex();
 
-		return (index != -1)? (index + 14 ): index;
+		if (index == -1)
+			throw ProgramExeption("Rootdir full", "RootDir::findNextIndex");
+
+		return index + 14;
 
 
 	}
-	
+
+
+	/*************************************************
+	* FUNCTION
+	*    insert
+	*
+	* PARAMETERS
+	*	DirEntry dir - The file to insert
+	*
+	* MEANING
+	*	The function receive a file and insert this dir
+	*
+	**************************************************/
+
+	void insert(DirEntry * dir)
+	{
+		*((*this)[findNextIndex()]) = *dir;
+	}
+
+
 	//no friend for this class
 
 };

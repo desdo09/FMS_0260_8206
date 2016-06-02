@@ -218,7 +218,7 @@ extern "C"
 			
 			ExternalFile file(allPath.c_str());
 			file.setStatus(THIS->getStatus());
-			THIS->createfile((string)fileName,(string) fileOwner, false, sizeof(ExternalFileSec), ExternalFile::calculateFileSize(allPath.c_str()), "I", 0, 2);
+			THIS->createfile((string)fileName,(string) fileOwner, true, sizeof(ExternalFileSec), ExternalFile::calculateFileSize(allPath.c_str()), "I", 0, 2);
 			created = true;
 			file.importFile();
 			file.exportToFcb(THIS->openfile((string)fileName, (string)fileOwner, enumsFMS::FCBtypeToOpening::inputOutput));
@@ -643,7 +643,7 @@ extern "C"
 	
 	__declspec(dllexport) double  getStatus(Disk * d)
 	{
-		
+			return rand()%100;
 			return *d->getStatus();
 		
 	}

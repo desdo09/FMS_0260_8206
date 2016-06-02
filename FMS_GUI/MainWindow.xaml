@@ -291,7 +291,12 @@
                 </DataGrid>
                 <GridSplitter x:Name="gridSplitter" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}" Width="3"/>
                 <!--files datagrid-->
-                <DataGrid Grid.Column="2" Name="fileList" IsReadOnly="True" AutoGenerateColumns="False" Background="{x:Null}" GridLinesVisibility="None">
+                <DataGrid Grid.Column="2" Name="fileList" IsReadOnly="True" AutoGenerateColumns="False" Background="{x:Null}" GridLinesVisibility="None" >
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="openButton_Click"/>
+                        </Style>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Image" Width="auto" IsReadOnly="True" >
                             <DataGridTemplateColumn.CellTemplate>

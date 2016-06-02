@@ -606,7 +606,7 @@ void Disk::flush()
 *
 **************************************************/
 
-void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize)
+void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint regSize, uint sectorSize, string  keyType, uint offset, uint keySize,SectorDir * dir)
 {
 
 	if (!this->mounted)
@@ -629,6 +629,7 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 	int firsSectorIndex;
 	alloc(fh.FAT, sectorSize + 1, Disk::AlgorithmType::best_Fit);			 // Plus one for the file header
 
+
 	firsSectorIndex = this->firstIndex(fh.FAT, false);
 	fh.fileDesc.fileAddr = firsSectorIndex;									  // File Address (First sector)
 	memcpy(fh.fileDesc.filename, fileName.c_str(), 12);				          // File name
@@ -645,15 +646,11 @@ void Disk::createfile(string & fileName, string & ownerFile, bool dynamic, uint 
 	fh.fileDesc.recFormat[1] = '\0';
 	fh.fileDesc.entryStatus = 1; 											  // 0 - empty 1 - Active 2- inactive
 
-	int dirEntryIndex;
-
-
-	dirEntryIndex = rootdir.findNextIndex();
-
-	if (dirEntryIndex != -1)
-		*this->rootdir[dirEntryIndex] = fh.fileDesc;
+																			  // insert the file
+	if (dir != NULL)
+		dir->insert(&fh.fileDesc);
 	else
-		throw ProgramExeption("Folder Full", "createfile");
+		rootdir.insert(&fh.fileDesc);											 
 
 
 	fh.sectorNr = firsSectorIndex;
@@ -673,7 +670,14 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize, FCB * 
 	if (!vhd.isFormated)
 		throw ProgramExeption("This disk is not formatted", "Disk::extendfile");
 
-	DirEntry * dir = rootdir[fileName.c_str()];
+	DirEntry * dir;
+	if (file != NULL)
+		dir = rootdir[fileName.c_str()];
+	else
+		dir = file->fileDesc;
+
+	if (dir->recFormat[0] == 'V')
+		throw ProgramExeption("Statics files cannot extend", "Disk::extendfile");
 
 	if (dir == NULL)
 		throw ProgramExeption("File not exist!", "Disk::extendfile");
@@ -707,7 +711,7 @@ void Disk::extendfile(string & fileName, string & owner, uint sectorSize, FCB * 
 	if (file != NULL)
 	{
 		file->FAT = fh.FAT;
-		file->fileDesc = fh.fileDesc;
+		*file->fileDesc = fh.fileDesc;
 	}
 
 	this->flush();
@@ -785,7 +789,7 @@ FileHeader Disk::getFileHeader(DirEntry * dir)
 *
 **************************************************/
 
-FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpening type)
+FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpening type, DirEntry * dir)
 {
 	if (!this->mounted)
 		throw ProgramExeption("There is not mounted disk", "Disk::openfile");
@@ -800,6 +804,7 @@ FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpenin
 
 	if (type != enumsFMS::FCBtypeToOpening::output && userName.compare(fileDir->fileOwner))
 		throw ProgramExeption("The user is not allowed to write in this file", "Disk::openfile");
+
 	//Find next sector after File Header
 	uint firstSec = firstIndex(getFileHeader(fileDir).getFAT(), false, firstIndex(getFileHeader(fileDir).getFAT(), false));
 
@@ -809,8 +814,10 @@ FCB * Disk::openfile(string fileName, string userName, enumsFMS::FCBtypeToOpenin
 
 	memcpy(key, (buffer.rawData + fileDir->keyOffset), fileDir->keySize);
 
-	return (new FCB(this, *fileDir, getFileHeader(fileDir).getFAT(),
-		NULL, 0, 0, type));
+	if (dir == NULL)
+		dir = rootdir[fileName.c_str()];
+
+	return (new FCB(this, dir, getFileHeader(fileDir).getFAT(), type));
 
 
 

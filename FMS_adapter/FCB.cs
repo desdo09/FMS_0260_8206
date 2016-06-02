@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -304,6 +305,24 @@ namespace FMS_adapter
             {
                 throw;
             }
+        }
+
+        public void exportFile<T>(string path) where T : class, new()
+        {
+            StreamWriter file;
+            if (File.Exists(path))
+                file = File.AppendText(path);
+            else
+                file = File.CreateText(path);
+
+            foreach (var item in getAllRecord<T>())
+            {
+                file.WriteLine(item.ToString());
+            }
+
+
+
+            file.Close();
         }
     }
 }
